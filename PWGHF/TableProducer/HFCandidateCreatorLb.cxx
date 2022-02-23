@@ -15,6 +15,12 @@
 ///
 /// \author Panos Christakoglou <panos.christakoglou@cern.ch>, Nikhef
 
+
+
+
+
+// importing packages - functionally - header files - libraries
+
 #include "Framework/AnalysisTask.h"
 #include "DetectorsVertexing/DCAFitterN.h"
 #include "PWGHF/DataModel/HFSecondaryVertex.h"
@@ -23,6 +29,7 @@
 #include "ReconstructionDataFormats/V0.h"
 #include "PWGHF/DataModel/HFCandidateSelectionTables.h"
 
+//  namespace - used to label a function specifying which package it belongs
 using namespace o2;
 using namespace o2::aod;
 using namespace o2::framework;
@@ -32,47 +39,77 @@ using namespace o2::aod::hf_cand_prong3;
 using namespace o2::aod::hf_cand_lb;
 using namespace o2::framework::expressions;
 
+// function below - void means that it doesnt return anything - within brackets are the arguments of the function
 void customize(std::vector<o2::framework::ConfigParamSpec>& workflowOptions)
+// function itself  - what it does - vector <o2::framework::ConfigParamSpec> is a template - workflowoptions is an input parameter of the format
 {
   ConfigParamSpec optionDoMC{"doMC", VariantType::Bool, true, {"Perform MC matching."}};
   workflowOptions.push_back(optionDoMC);
 }
-
+ 
+// this function is enabling the MC matching that happens at near the end of the code
 #include "Framework/runDataProcessing.h"
 
 /// Reconstruction of Λb candidates
 struct HFCandidateCreatorLb {
+  /// this thing below: where we tell o2 that what comes out of the structure. its going to be different in our case.
   Produces<aod::HfCandLbBase> rowCandidateBase;
-
+  /// strange way of assinging values to the variables, looks more like a dictionary       
   Configurable<double> magneticField{"magneticField", 20., "magnetic field"};
   Configurable<bool> b_propdca{"b_propdca", true, "create tracks version propagated to PCA"};
+  /// maybe greater d_max than 200
   Configurable<double> d_maxr{"d_maxr", 200., "reject PCA's above this radius"};
+  // no clue
   Configurable<double> d_maxdzini{"d_maxdzini", 4., "reject (if>0) PCA candidate if tracks DZ exceeds threshold"};
+  // what do you mean by change: when reconstructing you use a fitting function iteratively. we stop at some point
   Configurable<double> d_minparamchange{"d_minparamchange", 1.e-3, "stop iterations if largest change of any Lb is smaller than this"};
+  //should remain the same
   Configurable<double> d_minrelchi2change{"d_minrelchi2change", 0.9, "stop iterations is chi2/chi2old > this"};
+  //threshold is actually a candidiate selection parameter, check this.  Ones below are ignored, they will not be detected in the  real experiment.
   Configurable<double> ptPionMin{"ptPionMin", 0.5, "minimum pion pT threshold (GeV/c)"};
 
+
+
+/// new particles require new entries in the histograms
   OutputObj<TH1F> hMassLcToPKPi{TH1F("hMassLcToPKPi", "#Lambda_{c}^{#plus} candidates;inv. mass (pK^{#minus} #pi^{#plus}) (GeV/#it{c}^{2});entries", 500, 0., 5.)};
+  // histogram of mass of lc to pkpi
   OutputObj<TH1F> hPtLc{TH1F("hPtLc", "#Lambda_{c}^{#plus} candidates;#Lambda_{c}^{#plus} candidate #it{p}_{T} (GeV/#it{c});entries", 100, 0., 10.)};
   OutputObj<TH1F> hPtPion{TH1F("hPtPion", "#pi^{#minus} candidates;#pi^{#minus} candidate #it{p}_{T} (GeV/#it{c});entries", 100, 0., 10.)};
   OutputObj<TH1F> hCPALc{TH1F("hCPALc", "#Lambda_{c}^{#plus} candidates;#Lambda_{c}^{#plus} cosine of pointing angle;entries", 110, -1.1, 1.1)};
   OutputObj<TH1F> hMassLbToLcPi{TH1F("hMassLbToLcPi", "2-prong candidates;inv. mass (#Lambda_{b}^{0} #rightarrow #Lambda_{c}^{#plus}#pi^{#minus} #rightarrow pK^{#minus}#pi^{#plus}#pi^{#minus}) (GeV/#it{c}^{2});entries", 500, 3., 8.)};
+  // this needs to be changed to 4 prong vertex
   OutputObj<TH1F> hCovPVXX{TH1F("hCovPVXX", "2-prong candidates;XX element of cov. matrix of prim. vtx position (cm^{2});entries", 100, 0., 1.e-4)};
+  // cov  =covariance matrix  (dont worry much about it)
   OutputObj<TH1F> hCovSVXX{TH1F("hCovSVXX", "2-prong candidates;XX element of cov. matrix of sec. vtx position (cm^{2});entries", 100, 0., 0.2)};
 
+
+/// normal way of assigning value to variable
   double massPi = RecoDecay::getMassPDG(kPiMinus);
   double massLc = RecoDecay::getMassPDG(pdg::Code::kLambdaCPlus);
+  
+/// this the actually the value to be calculated of lmbda b invariant masses
   double massLcPi = 0.;
 
   Configurable<int> d_selectionFlagLc{"d_selectionFlagLc", 1, "Selection Flag for Lc"};
+/// selection flag =  applying flags to suitables candidates for Lc
+/// why not apply to pions = they are simple to detect?
+///is kaon a simple particle = also a simple particle doesnt req flagging?
   Configurable<double> cutYCandMax{"cutYCandMax", -1., "max. cand. rapidity"};
+  /// This doesnt depend on the nature of particles, accepts everything
   Filter filterSelectCandidates = (aod::hf_selcandidate_lc::isSelLcpKpi >= d_selectionFlagLc || aod::hf_selcandidate_lc::isSelLcpiKp >= d_selectionFlagLc);
+  /// assigning a variable again?. Filter is keeping only the flagged ones
+
+
+
+
+  // this function does: 
+
 
   void process(aod::Collision const& collision,
                soa::Filtered<soa::Join<
                  aod::HfCandProng3,
                  aod::HFSelLcCandidate>> const& lcCands,
-               aod::BigTracks const& tracks)
+               aod::BigTracks const& tracks)   // check this format? what is this?
   {
     // 2-prong vertex fitter
     o2::vertexing::DCAFitterN<2> df2;
@@ -94,30 +131,62 @@ struct HFCandidateCreatorLb {
     df3.setMinRelChi2Change(d_minrelchi2change);
     df3.setUseAbsDCA(true);
 
+
+    /// my prongs
+    o2::vertexing::DCAFitterN<4> df4;
+    df4.setBz(magneticField);
+    df4.setPropagateToPCA(b_propdca);
+    df4.setMaxR(d_maxr);
+    df4.setMaxDZIni(d_maxdzini);
+    df4.setMinParamChange(d_minparamchange);
+    df4.setMinRelChi2Change(d_minrelchi2change);
+    df4.setUseAbsDCA(true);
+
+
+    /// check the difference bw vertex fitter and reconstructor
+
+
+
     // loop over Lc candidates
+
+
+
+
+    // auto& if you dont know its an integer or double
+    //lc Cands is the list of candidates
+    // iterators : pointer to first element of the container (something advanced than an array, its a collection of elements). Difference in array and vector in C++
+    // lcCand  =  pointer to elements in container in lcCands.
+
+
     for (auto& lcCand : lcCands) {
-      if (!(lcCand.hfflag() & 1 << o2::aod::hf_cand_prong3::DecayType::LcToPKPi)) {
+      /// check if it has been labelled as a lc decaying into PKPi
+      
+      if (!(lcCand.hfflag() & 1 << o2::aod::hf_cand_prong3::DecayType::LcToPKPi)) {    /// check what this does.
         continue;
       }
-      if (lcCand.isSelLcpKpi() >= d_selectionFlagLc) {
+      if (lcCand.isSelLcpKpi() >= d_selectionFlagLc) {         /// proton and pion are both positive. Kaon is negative. Taking two combaination togather + - + (three paths)
         hMassLcToPKPi->Fill(InvMassLcpKpi(lcCand), lcCand.pt());
       }
       if (lcCand.isSelLcpiKp() >= d_selectionFlagLc) {
         hMassLcToPKPi->Fill(InvMassLcpiKp(lcCand), lcCand.pt());
       }
+      // adding values to histograms
       hPtLc->Fill(lcCand.pt());
       hCPALc->Fill(lcCand.cpa());
-
+      /// declaring the tracks of daughters of lambda C
       auto track0 = lcCand.index0_as<aod::BigTracks>();
       auto track1 = lcCand.index1_as<aod::BigTracks>();
       auto track2 = lcCand.index2_as<aod::BigTracks>();
-      auto trackParVar0 = getTrackParCov(track0);
+      auto trackParVar0 = getTrackParCov(track0);  /// 
       auto trackParVar1 = getTrackParCov(track1);
       auto trackParVar2 = getTrackParCov(track2);
+      // this is collision for the tracks, all tracks result from same collision, so its same
       auto collision = track0.collision();
 
       // reconstruct the 3-prong secondary vertex
-      if (df3.process(trackParVar0, trackParVar1, trackParVar2) == 0) {
+
+      // decay vertex is farther from original vertex * 
+      if (df3.process(trackParVar0, trackParVar1, trackParVar2) == 0) {  // ?
         continue;
       }
       const auto& secondaryVertex = df3.getPCACandidate();
@@ -125,7 +194,7 @@ struct HFCandidateCreatorLb {
       trackParVar1.propagateTo(secondaryVertex[0], magneticField);
       trackParVar2.propagateTo(secondaryVertex[0], magneticField);
 
-      array<float, 3> pvecpK = {track0.px() + track1.px(), track0.py() + track1.py(), track0.pz() + track1.pz()};
+      array<float, 3> pvecpK = {track0.px() + track1.px(), track0.py() + track1.py(), track0.pz() + track1.pz()}; // computing the momentum vector by summing up momenta of daughters
       array<float, 3> pvecLc = {pvecpK[0] + track2.px(), pvecpK[1] + track2.py(), pvecpK[2] + track2.pz()};
       auto trackpK = o2::dataformats::V0(df3.getPCACandidatePos(), pvecpK, df3.calcPCACovMatrixFlat(),
                                          trackParVar0, trackParVar1, {0, 0}, {0, 0});
@@ -137,30 +206,73 @@ struct HFCandidateCreatorLb {
       int index2Lc = track2.globalIndex();
       //int charge = track0.sign() + track1.sign() + track2.sign();
 
+
+      /// look for two pions because i have two pions to look for aginst one that is generated by lambda c decay
+      ///
+
+      
+      // pions = []  // initiate a dictionary/ container for trackpions
+      // 
       for (auto& trackPion : tracks) {
-        if (trackPion.pt() < ptPionMin) {
+        if (trackPion.pt() < ptPionMin) {    /// momenta being selection criteria? a safe slection criteria
+          continue;                          /// ptPionMin change this for Xi cc /// limitations :  combinations and storage // maybe do more cuts (more selection criteria)
+        }
+        // check for my own decay
+        if (trackPion.sign() > 0) {         // in my decay decay we have has positive pions /// change to trackPion.sign() < 0
           continue;
         }
-        if (trackPion.sign() > 0) {
-          continue;
-        }
+        /// checks if the new pion is not the one coming Lc
         if (trackPion.globalIndex() == index0Lc || trackPion.globalIndex() == index1Lc || trackPion.globalIndex() == index2Lc) {
           continue;
         }
+        // pions.append[trackPion]
+      }
+      
+      //pairpion = []  // initiate a dictionary/ container for trackpions pairs
+      for (auto& trackPion1 : range(len(pions))) {
+
+        for (auto& trackPion2 : range(len(pions))) {
+          if (trackPion1 == trackPion2){
+            continue  
+          }
+          pairpion.append([pions[trackpion1], pions[trackpion2]])
+        }
+        
+      }
+    
+        // get a list of filtered pions. loop over that list 
+
+        for (auto& trackKaon : tracks){
+          if (trackKaon.pt()< ptKaonMin){
+            continue;
+          }
+          if(trackKaon.sign()>0){
+            continue;
+          }
+          if (trackKaon.globalIndex() == index0Lc || trackPion.globalIndex() == index1Lc || trackPion.globalIndex() == index2Lc) {
+          continue;
+        }
+
+        }
+
+
+
+
+        //filling to histogram
         hPtPion->Fill(trackPion.pt());
         array<float, 3> pvecPion;
         auto trackParVarPi = getTrackParCov(trackPion);
 
-        // reconstruct the 3-prong Lc vertex
-        if (df2.process(trackLc, trackParVarPi) == 0) {
+        // reconstruct the 2-prong Lb vertex
+        if (df2.process(trackLc, trackParVarPi) == 0) {  /// equals 0 check is if the process function was successfull
           continue;
         }
 
-        // calculate relevant properties
+        // calculate relevant properties     (of potential lb candidate)
         const auto& secondaryVertexLb = df2.getPCACandidate();
         auto chi2PCA = df2.getChi2AtPCACandidate();
         auto covMatrixPCA = df2.calcPCACovMatrixFlat();
-
+        // replace with df3 ?  df4????
         df2.propagateTracksToVertex();
         df2.getTrack(0).getPxPyPzGlo(pvecLc);
         df2.getTrack(1).getPxPyPzGlo(pvecPion);
@@ -293,3 +405,9 @@ WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
   }
   return workflow;
 }
+
+
+
+
+// Particle identification part needs to be added/ actually not, see: PWGHF/TableProducer/HFLcK0sPCandidateSelector.cxx
+// no pid for pion, pid for kaons? = 
