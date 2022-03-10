@@ -72,7 +72,8 @@ struct HFCandidateCreatorLb {
                soa::Filtered<soa::Join<
                  aod::HfCandProng3,
                  aod::HFSelLcCandidate>> const& lcCands,
-               aod::BigTracks const& tracks)
+               aod::BigTracks const& tracks,
+               aod::HfCandProng3Base const& Prong3BaseCands)
   {
     // 2-prong vertex fitter
     o2::vertexing::DCAFitterN<2> df2;
@@ -137,19 +138,25 @@ struct HFCandidateCreatorLb {
       int index2Lc = track2.globalIndex();
       //int charge = track0.sign() + track1.sign() + track2.sign();
 
-      for (auto& trackPion : tracks) {
-        if (trackPion.pt() < ptPionMin) {
+      for (auto& Prong3Cand : Prong3BaseCands) {
+        if (Prong3Cand.index0_as<aod::BigTracks>().pt() < ptPionMin) {
           continue;
         }
-        if (trackPion.sign() > 0) {
+        if (Prong3Cand.index1_as<aod::BigTracks>().pt() < ptPionMin) {
           continue;
         }
-        if (trackPion.globalIndex() == index0Lc || trackPion.globalIndex() == index1Lc || trackPion.globalIndex() == index2Lc) {
+        if (Prong3Cand.index2_as<aod::BigTracks>().pt() < ptPionMin) {
           continue;
         }
-        hPtPion->Fill(trackPion.pt());
+        if (Prong3Cand.sign() > 0) {
+          continue;
+        }
+        if (Prong3Cand.globalIndex() == index0Lc || Prong3Cand.globalIndex() == index1Lc || Prong3Cand.globalIndex() == index2Lc) {
+          continue;
+        }
+        hPtPion->Fill(Prong3Cand.pt());
         array<float, 3> pvecPion;
-        auto trackParVarPi = getTrackParCov(trackPion);
+        auto trackParVarPi = getTrackParCov(Prong3Cand);
 
         // reconstruct the 3-prong Lc vertex
         if (df2.process(trackLc, trackParVarPi) == 0) {
@@ -193,7 +200,7 @@ struct HFCandidateCreatorLb {
                          pvecPion[0], pvecPion[1], pvecPion[2],
                          impactParameter0.getY(), impactParameter1.getY(),
                          std::sqrt(impactParameter0.getSigmaY2()), std::sqrt(impactParameter1.getSigmaY2()),
-                         lcCand.globalIndex(), trackPion.globalIndex(),
+                         lcCand.globalIndex(), Prong3Cand.globalIndex(),
                          hfFlag);
 
         // calculate invariant mass
