@@ -159,3 +159,7 @@ o2physics_add_dpl_workflow(chic-tojpsigamma-candidate-selector
                     PUBLIC_LINK_LIBRARIES O2::Framework O2Physics::AnalysisCore O2::DetectorsVertexing
                     COMPONENT_NAME Analysis)
 
+o2physics_add_dpl_workflow(candidate-creator-cascade
+                    SOURCES HFCandidateCreatorXicctoLcPiKPi.cxx
+                    PUBLIC_LINK_LIBRARIES O2::Framework O2Physics::AnalysisCore O2::DetectorsVertexing ROOT::EG
+                    COMPONENT_NAME Analysis)
