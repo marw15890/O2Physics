@@ -148,9 +148,24 @@ struct HFCandidateCreatorLb {
         if (Prong3Cand.index2_as<aod::BigTracks>().pt() < ptPionMin) {
           continue;
         }
-        if (Prong3Cand.sign() > 0) {
+        if (Prong3Cand.index0_as<aod::BigTracks>().sign() > 0) {
           continue;
         }
+        if (Prong3Cand.index1_as<aod::BigTracks>().sign() > 0) {
+          continue;
+        }
+        if (Prong3Cand.index2_as<aod::BigTracks>().sign() > 0) {
+          continue;
+        }
+
+
+
+
+
+
+
+
+
         if (Prong3Cand.globalIndex() == index0Lc || Prong3Cand.globalIndex() == index1Lc || Prong3Cand.globalIndex() == index2Lc) {
           continue;
         }
