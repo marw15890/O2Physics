@@ -15,6 +15,7 @@
 ///
 /// \author Panos Christakoglou <panos.christakoglou@cern.ch>, Nikhef
 
+#include "Framework/runDataProcessing.h"
 #include "Framework/AnalysisTask.h"
 #include "DetectorsVertexing/DCAFitterN.h"
 #include "PWGHF/DataModel/HFSecondaryVertex.h"
@@ -72,8 +73,9 @@ struct HFCandidateCreatorLb {
                soa::Filtered<soa::Join<
                  aod::HfCandProng3,
                  aod::HFSelLcCandidate>> const& lcCands,
-               aod::BigTracks const& tracks,
-               aod::HfCandProng3Base const& Prong3BaseCands)
+               aod::BigTracks const& tracks)
+               // ,
+               //  aod::HfCandProng3Base const& Prong3BaseCands)
   {
     // 2-prong vertex fitter
     o2::vertexing::DCAFitterN<2> df2;
@@ -137,7 +139,7 @@ struct HFCandidateCreatorLb {
       int index1Lc = track1.globalIndex();
       int index2Lc = track2.globalIndex();
       //int charge = track0.sign() + track1.sign() + track2.sign();
-
+      /*
       for (auto& Prong3Cand : Prong3BaseCands) {
         if (Prong3Cand.index0_as<aod::BigTracks>().pt() < ptPionMin) {
           continue;
@@ -228,6 +230,8 @@ struct HFCandidateCreatorLb {
           hMassLbToLcPi->Fill(massLcPi);
         }
       } // pi- loop
+      */
+
     }   // Lc loop
   }     // process
 };      // struct
