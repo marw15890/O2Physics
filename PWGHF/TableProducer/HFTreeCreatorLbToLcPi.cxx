@@ -79,11 +79,11 @@ DECLARE_SOA_COLUMN(NSigRICHTrk1Pr, nSigRICHTrk1Pr, float);
 DECLARE_SOA_COLUMN(NSigRICHTrk2Ka, nSigRICHTrk2Ka, float);
 DECLARE_SOA_COLUMN(NSigRICHTrk3Pi, nSigRICHTrk3Pi, float);
 DECLARE_SOA_COLUMN(NSigRICHTrk3Pr, nSigRICHTrk3Pr, float);
-//DECLARE_SOA_COLUMN(NSigTOFTrk1Pi, nSigTOFrk1Pi, float);
-//DECLARE_SOA_COLUMN(NSigTOFTrk1Pr, nSigTOFrk1Pr, float);
-//DECLARE_SOA_COLUMN(NSigTOFTrk2Ka, nSigTOFrk2Ka, float);
-//DECLARE_SOA_COLUMN(NSigTOFTrk3Pi, nSigTOFrk3Pi, float);
-//DECLARE_SOA_COLUMN(NSigTOFTrk3Pr, nSigTOFrk3Pr, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk1Pi, nSigTOFrk1Pi, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk1Pr, nSigTOFrk1Pr, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk2Ka, nSigTOFrk2Ka, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk3Pi, nSigTOFrk3Pi, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk3Pr, nSigTOFrk3Pr, float);
 
 // Events
 DECLARE_SOA_COLUMN(IsEventReject, isEventReject, int);
@@ -121,11 +121,11 @@ DECLARE_SOA_TABLE(HfCandLbFull, "AOD", "HFCANDLbFull",
                   full::NSigRICHTrk2Ka,
                   full::NSigRICHTrk3Pi,
                   full::NSigRICHTrk3Pr,
-                  //full::NSigTOFTrk1Pi,
-                  //full::NSigTOFTrk1Pr,
-                  //full::NSigTOFTrk2Ka,
-                  //full::NSigTOFTrk3Pi,
-                  //full::NSigTOFTrk3Pr,
+                  full::NSigTOFTrk1Pi,
+                  full::NSigTOFTrk1Pr,
+                  full::NSigTOFTrk2Ka,
+                  full::NSigTOFTrk3Pi,
+                  full::NSigTOFTrk3Pr,
                   full::LcM,
                   full::LcCt,
                   full::LcY,
@@ -306,11 +306,11 @@ struct HfTreeCreatorLbToLcPi {
             RICHTrk2K,
             RICHTrk3Pi,
             RICHTrk3p,
-            //LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPi(),
-            //LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPr(),
-            //LcCand.index1_as<aod::BigTracksPID>().tofNSigmaKa(),
-            //LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPi(),
-            //LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPr(),
+            track1.tofNSigmaPi(), // LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPi(),
+            track1.tofNSigmaPr(), // LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPr(),
+            track2.tofNSigmaKa(), // LcCand.index1_as<aod::BigTracksPID>().tofNSigmaKa(),
+            track3.tofNSigmaPi(), // LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPi(),
+            track3.tofNSigmaPr(), // LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPr(),
             o2::aod::hf_cand_prong3::InvMassLcpKpi(LcCand),
             o2::aod::hf_cand_prong3::CtLc(LcCand),
             o2::aod::hf_cand_prong3::YLc(LcCand),
