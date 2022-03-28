@@ -359,7 +359,7 @@ struct HfTreeCreatorLbToLcPi {
 WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
 {
   WorkflowSpec workflow;
-  // workflow.push_back(adaptAnalysisTask<Alice3PidIndexBuilder>(cfgc));
+  workflow.push_back(adaptAnalysisTask<Alice3PidIndexBuilder>(cfgc));
   workflow.push_back(adaptAnalysisTask<HfTreeCreatorLbToLcPi>(cfgc));
   return workflow;
 }
