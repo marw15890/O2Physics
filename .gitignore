@@ -13,3 +13,4 @@ compile_commands.json
 /.vs/ProjectSettings.json
 /.vs/slnx.sqlite
 /.vs/VSWorkspaceState.json
+/.vs/CMakeWorkspaceSettings.json
