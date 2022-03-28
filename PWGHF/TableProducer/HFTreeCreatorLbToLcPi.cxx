@@ -169,25 +169,31 @@ DECLARE_SOA_TABLE(HfCandLbFull, "AOD", "HFCANDLbFull",
 
 } // namespace o2::aod
 
-// namespace o2::aod //copied from Jpsi cand sel
-//{
-// namespace hf_track_index_alice3_pid
-//{
-// DECLARE_SOA_INDEX_COLUMN(Track, track); //!
-// DECLARE_SOA_INDEX_COLUMN(RICH, rich);   //!
-// DECLARE_SOA_INDEX_COLUMN(MID, mid);     //!
-// } // namespace hf_track_index_alice3_pid
-//
-// DECLARE_SOA_INDEX_TABLE_USER(HfTrackIndexALICE3PID, Tracks, "HFTRKIDXA3PID", //!
-//                              hf_track_index_alice3_pid::TrackId,
-//                              hf_track_index_alice3_pid::RICHId,
-//                              hf_track_index_alice3_pid::MIDId);
-// } // namespace o2::aod
-//
-// struct Alice3PidIndexBuilder {
-//   Builds<o2::aod::HfTrackIndexALICE3PID> index;
-//   void init(o2::framework::InitContext&) {}
-// };
+ namespace o2::aod //copied from Jpsi cand sel
+{
+ namespace hf_track_index_alice3_pid
+{
+ DECLARE_SOA_INDEX_COLUMN(Track, track); //!
+ DECLARE_SOA_INDEX_COLUMN(RICH, rich);   //!
+ DECLARE_SOA_INDEX_COLUMN(MID, mid);     //!
+ } // namespace hf_track_index_alice3_pid
+
+ DECLARE_SOA_INDEX_TABLE_USER(HfTrackIndexALICE3PID, Tracks, "HFTRKIDXA3PID", //!
+                              hf_track_index_alice3_pid::TrackId,
+                              hf_track_index_alice3_pid::RICHId,
+                              hf_track_index_alice3_pid::MIDId);
+ } // namespace o2::aod
+
+ struct Alice3PidIndexBuilder {
+   Builds<o2::aod::HfTrackIndexALICE3PID> index;
+   void init(o2::framework::InitContext&) {}
+ };
+
+ void customize(std::vector<o2::framework::ConfigParamSpec>& workflowOptions)
+ {
+   ConfigParamSpec isAlice3{"isAlice3", VariantType::Bool, true, {"Switch between ALICE 2 and ALICE 3 detector setup"}};
+   workflowOptions.push_back(isAlice3);
+ }
 
 /// Writes the full information in an output TTree
 struct HfTreeCreatorLbToLcPi {
