@@ -74,16 +74,16 @@ DECLARE_SOA_COLUMN(LcChi2PCA, lcChi2PCA, float);
 DECLARE_SOA_COLUMN(LcDecayLength, lcDecayLength, float);
 DECLARE_SOA_COLUMN(LcDecayLengthXY, lcDecayLengthXY, float);
 DECLARE_SOA_COLUMN(LcDecayLengthNormalised, lcDecayLengthNormalised, float);
- DECLARE_SOA_COLUMN(NSigRICHTrk1Pi, nSigRICHTrk1Pi, float);
- DECLARE_SOA_COLUMN(NSigRICHTrk1Pr, nSigRICHTrk1Pr, float);
- DECLARE_SOA_COLUMN(NSigRICHTrk2Ka, nSigRICHTrk2Ka, float);
- DECLARE_SOA_COLUMN(NSigRICHTrk3Pi, nSigRICHTrk3Pi, float);
- DECLARE_SOA_COLUMN(NSigRICHTrk3Pr, nSigRICHTrk3Pr, float);
- DECLARE_SOA_COLUMN(NSigTOFTrk1Pi, nSigTOFrk1Pi, float);
- DECLARE_SOA_COLUMN(NSigTOFTrk1Pr, nSigTOFrk1Pr, float);
- DECLARE_SOA_COLUMN(NSigTOFTrk2Ka, nSigTOFrk2Ka, float);
- DECLARE_SOA_COLUMN(NSigTOFTrk3Pi, nSigTOFrk3Pi, float);
- DECLARE_SOA_COLUMN(NSigTOFTrk3Pr, nSigTOFrk3Pr, float);
+DECLARE_SOA_COLUMN(NSigRICHTrk1Pi, nSigRICHTrk1Pi, float);
+DECLARE_SOA_COLUMN(NSigRICHTrk1Pr, nSigRICHTrk1Pr, float);
+DECLARE_SOA_COLUMN(NSigRICHTrk2Ka, nSigRICHTrk2Ka, float);
+DECLARE_SOA_COLUMN(NSigRICHTrk3Pi, nSigRICHTrk3Pi, float);
+DECLARE_SOA_COLUMN(NSigRICHTrk3Pr, nSigRICHTrk3Pr, float);
+//DECLARE_SOA_COLUMN(NSigTOFTrk1Pi, nSigTOFrk1Pi, float);
+//DECLARE_SOA_COLUMN(NSigTOFTrk1Pr, nSigTOFrk1Pr, float);
+//DECLARE_SOA_COLUMN(NSigTOFTrk2Ka, nSigTOFrk2Ka, float);
+//DECLARE_SOA_COLUMN(NSigTOFTrk3Pi, nSigTOFrk3Pi, float);
+//DECLARE_SOA_COLUMN(NSigTOFTrk3Pr, nSigTOFrk3Pr, float);
 
 // Events
 DECLARE_SOA_COLUMN(IsEventReject, isEventReject, int);
@@ -269,12 +269,12 @@ struct HfTreeCreatorLbToLcPi {
            auto RICHTrk3Pi = -5000.0;
            auto RICHTrk3p = -5000.0;
 
-          //if (track0.has_rich()) RICHPi0 = track0.rich().richNsigmaPi();
-          //if (track1.has_rich()) RICHTrk1Pi = track1.rich().richNsigmaPi();
-          //if (track1.has_rich()) RICHTrk1p = track1.rich().richNsigmaPr();
-          //if (track2.has_rich()) RICHTrk2K = track2.rich().richNsigmaKa();
-          //if (track3.has_rich()) RICHTrk3Pi = track3.rich().richNsigmaPi();
-          //if (track3.has_rich()) RICHTrk3p = track3.rich().richNsigmaPr();
+          if (track0.has_rich()) RICHPi0 = track0.rich().richNsigmaPi();
+          if (track1.has_rich()) RICHTrk1Pi = track1.rich().richNsigmaPi();
+          if (track1.has_rich()) RICHTrk1p = track1.rich().richNsigmaPr();
+          if (track2.has_rich()) RICHTrk2K = track2.rich().richNsigmaKa();
+          if (track3.has_rich()) RICHTrk3Pi = track3.rich().richNsigmaPi();
+          if (track3.has_rich()) RICHTrk3p = track3.rich().richNsigmaPr();
 
           rowCandidateFull(
             candidate.rSecondaryVertex(),
@@ -306,11 +306,11 @@ struct HfTreeCreatorLbToLcPi {
             RICHTrk2K,
             RICHTrk3Pi,
             RICHTrk3p,
-            LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPi(),
-            LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPr(),
-            LcCand.index1_as<aod::BigTracksPID>().tofNSigmaKa(),
-            LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPi(),
-            LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPr(),
+            //LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPi(),
+            //LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPr(),
+            //LcCand.index1_as<aod::BigTracksPID>().tofNSigmaKa(),
+            //LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPi(),
+            //LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPr(),
             o2::aod::hf_cand_prong3::InvMassLcpKpi(LcCand),
             o2::aod::hf_cand_prong3::CtLc(LcCand),
             o2::aod::hf_cand_prong3::YLc(LcCand),
