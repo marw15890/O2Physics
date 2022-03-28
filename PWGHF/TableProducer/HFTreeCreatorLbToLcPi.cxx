@@ -150,22 +150,22 @@ DECLARE_SOA_TABLE(HfCandLbFull, "AOD", "HFCANDLbFull",
                   full::MCflag);
 // full::PDGMother);
 
-DECLARE_SOA_TABLE(HfCandLbFullEvents, "AOD", "HFCANDLbFullE",
-                  collision::BCId,
-                  collision::NumContrib,
-                  collision::PosX,
-                  collision::PosY,
-                  collision::PosZ,
-                  full::IsEventReject,
-                  full::RunNumber);
-
-DECLARE_SOA_TABLE(HfCandLbFullParticles, "AOD", "HFCANDLbFullP",
-                  collision::BCId,
-                  full::Pt,
-                  full::Eta,
-                  full::Phi,
-                  full::Y,
-                  full::MCflag);
+//DECLARE_SOA_TABLE(HfCandLbFullEvents, "AOD", "HFCANDLbFullE",
+//                  collision::BCId,
+//                  collision::NumContrib,
+//                  collision::PosX,
+//                  collision::PosY,
+//                  collision::PosZ,
+//                  full::IsEventReject,
+//                  full::RunNumber);
+//
+//DECLARE_SOA_TABLE(HfCandLbFullParticles, "AOD", "HFCANDLbFullP",
+//                  collision::BCId,
+//                  full::Pt,
+//                  full::Eta,
+//                  full::Phi,
+//                  full::Y,
+//                  full::MCflag);
 
 } // namespace o2::aod
 
@@ -192,8 +192,8 @@ DECLARE_SOA_TABLE(HfCandLbFullParticles, "AOD", "HFCANDLbFullP",
 /// Writes the full information in an output TTree
 struct HfTreeCreatorLbToLcPi {
   Produces<o2::aod::HfCandLbFull> rowCandidateFull;
-  Produces<o2::aod::HfCandLbFullEvents> rowCandidateFullEvents;
-  Produces<o2::aod::HfCandLbFullParticles> rowCandidateFullParticles;
+  //Produces<o2::aod::HfCandLbFullEvents> rowCandidateFullEvents;
+  //Produces<o2::aod::HfCandLbFullParticles> rowCandidateFullParticles;
 
   void init(InitContext const&)
   {
@@ -217,17 +217,17 @@ struct HfTreeCreatorLbToLcPi {
   {
 
     // Filling event properties
-    rowCandidateFullEvents.reserve(collisions.size());
-    for (auto& collision : collisions) {
-      rowCandidateFullEvents(
-        collision.bcId(),
-        collision.numContrib(),
-        collision.posX(),
-        collision.posY(),
-        collision.posZ(),
-        0,
-        1);
-    }
+    //rowCandidateFullEvents.reserve(collisions.size());
+    //for (auto& collision : collisions) {
+    //  rowCandidateFullEvents(
+    //    collision.bcId(),
+    //    collision.numContrib(),
+    //    collision.posX(),
+    //    collision.posY(),
+    //    collision.posZ(),
+    //    0,
+    //    1);
+    //}
 
     // Filling candidate properties
     rowCandidateFull.reserve(candidates.size());
@@ -251,10 +251,10 @@ struct HfTreeCreatorLbToLcPi {
         // int pdgmother) { //second peak inv
         if (FunctionSelection >= 1) { // Set to true to keep unselected events as well  FunctionSelection >= 1
           auto LcCand = candidate.index0_as<soa::Join<aod::HfCandProng3, aod::HfCandProng3MCRec, aod::HFSelLcCandidate>>();
-          // auto track0 = candidate.index1_as<ExtendedTracksPID>(); //daughter pion track
-          // auto track1 = LcCand.index0_as<ExtendedTracksPID>(); //granddaughter tracks (lc decay particles)
-          // auto track2 = LcCand.index1_as<ExtendedTracksPID>();
-          // auto track3 = LcCand.index2_as<ExtendedTracksPID>();
+           auto track0 = candidate.index1_as<ExtendedTracksPID>(); //daughter pion track
+           auto track1 = LcCand.index0_as<ExtendedTracksPID>(); //granddaughter tracks (lc decay particles)
+           auto track2 = LcCand.index1_as<ExtendedTracksPID>();
+           auto track3 = LcCand.index2_as<ExtendedTracksPID>();
 
           // auto RICHPi0 = -5000.0;
           // auto RICHTrk1Pi = -5000.0;
@@ -335,18 +335,18 @@ struct HfTreeCreatorLbToLcPi {
     }
 
     // Filling particle properties
-    rowCandidateFullParticles.reserve(particles.size());
-    for (auto& particle : particles) {
-      if (std::abs(particle.flagMCMatchGen()) == 1 << DecayType::LbToLcPi) {
-        rowCandidateFullParticles(
-          particle.mcCollision().bcId(),
-          particle.pt(),
-          particle.eta(),
-          particle.phi(),
-          RecoDecay::Y(array{particle.px(), particle.py(), particle.pz()}, RecoDecay::getMassPDG(particle.pdgCode())),
-          particle.flagMCMatchGen());
-      }
-    }
+    //rowCandidateFullParticles.reserve(particles.size());
+    //for (auto& particle : particles) {
+    //  if (std::abs(particle.flagMCMatchGen()) == 1 << DecayType::LbToLcPi) {
+    //    rowCandidateFullParticles(
+    //      particle.mcCollision().bcId(),
+    //      particle.pt(),
+    //      particle.eta(),
+    //      particle.phi(),
+    //      RecoDecay::Y(array{particle.px(), particle.py(), particle.pz()}, RecoDecay::getMassPDG(particle.pdgCode())),
+    //      particle.flagMCMatchGen());
+    //  }
+    //}
   }
 };
 
