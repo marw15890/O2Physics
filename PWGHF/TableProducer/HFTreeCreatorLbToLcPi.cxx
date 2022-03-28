@@ -24,9 +24,9 @@
 #include "PWGHF/DataModel/HFCandidateSelectionTables.h"
 #include "Common/Core/trackUtilities.h"
 #include "ReconstructionDataFormats/DCA.h"
-//#include "Common/Core/TrackSelectorPID.h"
-//#include "ALICE3/DataModel/RICH.h"
-//#include "ALICE3/DataModel/MID.h"
+#include "Common/Core/TrackSelectorPID.h"
+#include "ALICE3/DataModel/RICH.h"
+#include "ALICE3/DataModel/MID.h"
 
 using namespace o2;
 using namespace o2::framework;
