@@ -26,7 +26,7 @@
 #include "ReconstructionDataFormats/DCA.h"
 #include "Common/Core/TrackSelectorPID.h"
 #include "ALICE3/DataModel/RICH.h"
-//#include "ALICE3/DataModel/MID.h"
+#include "ALICE3/DataModel/MID.h"
 #include "Common/Core/PID/PIDResponse.h" //from D0 cand sel ALICE3 Barrel
 #include "ReconstructionDataFormats/PID.h" //from D0 cand sel ALICE3 Barrel
 
