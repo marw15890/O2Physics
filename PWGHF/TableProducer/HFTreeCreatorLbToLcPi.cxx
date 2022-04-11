@@ -208,7 +208,7 @@ struct HfTreeCreatorLbToLcPi {
   using TracksPID = soa::Join<aod::BigTracksPID, aod::HfTrackIndexALICE3PID>;
 
   //using ExtendedTracksPID = soa::Join<aod::BigTracksPID, aod::TracksExtended>;
-  using ExtendedTracksPID = soa::Join<TracksPID, aod::TracksExtended>;
+  using ExtendedTracksPID = soa::Join<TracksPID, aod::TracksExtended, aod::RICHs, aod::MIDs>;
 
   void process(//aod::Collisions const& collisions,
                //aod::McCollisions const& mccollisions,
