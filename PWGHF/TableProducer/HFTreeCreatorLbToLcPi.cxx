@@ -171,31 +171,47 @@ DECLARE_SOA_TABLE(HfCandLbFull, "AOD", "HFCANDLbFull",
 
 } // namespace o2::aod
 
- namespace o2::aod //copied from Jpsi cand sel
+// namespace o2::aod //copied from Jpsi cand sel
+//{
+// namespace hf_track_index_alice3_pid
+//{
+// DECLARE_SOA_INDEX_COLUMN(Track, track); //!
+// DECLARE_SOA_INDEX_COLUMN(RICH, rich);   //!
+// DECLARE_SOA_INDEX_COLUMN(MID, mid);     //!
+// } // namespace hf_track_index_alice3_pid
+//
+// DECLARE_SOA_INDEX_TABLE_USER(HfTrackIndexALICE3PID, Tracks, "HFTRKIDXA3PID", //!
+//                              hf_track_index_alice3_pid::TrackId,
+//                              hf_track_index_alice3_pid::RICHId,
+//                              hf_track_index_alice3_pid::MIDId);
+// } // namespace o2::aod
+//
+// struct Alice3PidIndexBuilder {
+//   Builds<o2::aod::HfTrackIndexALICE3PID> index;
+//   void init(o2::framework::InitContext&) {}
+// };
+ //void customize(std::vector<o2::framework::ConfigParamSpec>& workflowOptions)
+ //{
+ //  ConfigParamSpec isAlice3{"isAlice3", VariantType::Bool, true, {"Switch between ALICE 2 and ALICE 3 detector setup"}};
+ //  workflowOptions.push_back(isAlice3);
+ //}
+
+namespace o2::aod
 {
- namespace hf_track_index_alice3_pid
+
+namespace indices
 {
- DECLARE_SOA_INDEX_COLUMN(Track, track); //!
- DECLARE_SOA_INDEX_COLUMN(RICH, rich);   //!
- DECLARE_SOA_INDEX_COLUMN(MID, mid);     //!
- } // namespace hf_track_index_alice3_pid
+DECLARE_SOA_INDEX_COLUMN(Track, track);
+DECLARE_SOA_INDEX_COLUMN(RICH, rich);
+} // namespace indices
+DECLARE_SOA_INDEX_TABLE_USER(RICHTracksIndex, Tracks, "RICHTRK", indices::TrackId, indices::RICHId);
+} // namespace o2::aod
 
- DECLARE_SOA_INDEX_TABLE_USER(HfTrackIndexALICE3PID, Tracks, "HFTRKIDXA3PID", //!
-                              hf_track_index_alice3_pid::TrackId,
-                              hf_track_index_alice3_pid::RICHId,
-                              hf_track_index_alice3_pid::MIDId);
- } // namespace o2::aod
+struct richIndexBuilder { // Builder of the RICH-track index linkage
+  Builds<o2::aod::RICHTracksIndex> indB;
+  void init(o2::framework::InitContext&) {}
+};
 
- struct Alice3PidIndexBuilder {
-   Builds<o2::aod::HfTrackIndexALICE3PID> index;
-   void init(o2::framework::InitContext&) {}
- };
-
- void customize(std::vector<o2::framework::ConfigParamSpec>& workflowOptions)
- {
-   ConfigParamSpec isAlice3{"isAlice3", VariantType::Bool, true, {"Switch between ALICE 2 and ALICE 3 detector setup"}};
-   workflowOptions.push_back(isAlice3);
- }
 
 /// Writes the full information in an output TTree
 struct HfTreeCreatorLbToLcPi {
@@ -207,10 +223,11 @@ struct HfTreeCreatorLbToLcPi {
   {
   }
 
-  using TracksPID = soa::Join<aod::BigTracksPID, aod::HfTrackIndexALICE3PID>;
+  //using TracksPID = soa::Join<aod::BigTracksPID, aod::HfTrackIndexALICE3PID>; //from version from Jpsi
 
   //using ExtendedTracksPID = soa::Join<aod::BigTracksPID, aod::TracksExtended>;
-  using ExtendedTracksPID = soa::Join<TracksPID,aod::TracksExtended, aod::HfTrackIndexALICE3PID, aod::McTrackLabels>; //aod::RICHTracksIndex,  aod::McTrackLabels, aod::RICHs, aod::MIDs
+  //using ExtendedTracksPID = soa::Join<TracksPID,aod::TracksExtended, aod::RICHTracksIndex, aod::McTrackLabels>; //aod::HfTrackIndexALICE3PID, aod::RICHTracksIndex,  aod::McTrackLabels, aod::RICHs, aod::MIDs
+  using ExtendedTracksPID = soa::Join<aod::BigTracksPIDExtended, aod::RICHTracksIndex, aod::McTrackLabels>; //from D0 cand sel ALICE3 Barrel
 
   void process(//aod::Collisions const& collisions,
                //aod::McCollisions const& mccollisions,
@@ -219,8 +236,8 @@ struct HfTreeCreatorLbToLcPi {
                //soa::Join<aod::McParticles, aod::HfCandLbMCGen> const& particles,
                aod::BigTracksPID const& tracks,
                aod::BigTracksMC const& bigtracksmc,
-               ExtendedTracksPID const&)
-  // aod::RICHs const&,
+               ExtendedTracksPID const&,
+               aod::RICHs const&)
   // aod::MIDs const&)
   {
 
@@ -361,7 +378,8 @@ struct HfTreeCreatorLbToLcPi {
 WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
 {
   WorkflowSpec workflow;
-  workflow.push_back(adaptAnalysisTask<Alice3PidIndexBuilder>(cfgc));
+  //workflow.push_back(adaptAnalysisTask<Alice3PidIndexBuilder>(cfgc));
+  workflow.push_back(adaptAnalysisTask<richIndexBuilder>(cfgc));
   workflow.push_back(adaptAnalysisTask<HfTreeCreatorLbToLcPi>(cfgc));
   return workflow;
 }
