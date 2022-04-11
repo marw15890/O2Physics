@@ -276,19 +276,19 @@ struct HfTreeCreatorLbToLcPi {
         // int pdgmother) { //second peak inv
         if (FunctionSelection >= 1) { // Set to true to keep unselected events as well  FunctionSelection >= 1
           auto LcCand = candidate.index0_as<soa::Join<aod::HfCandProng3, aod::HfCandProng3MCRec, aod::HFSelLcCandidate>>();
-           auto track0 = candidate.index1_as<ExtendedTracksPID>(); //daughter pion track
-           auto track1 = LcCand.index0_as<ExtendedTracksPID>(); //granddaughter tracks (lc decay particles)
-           auto track2 = LcCand.index1_as<ExtendedTracksPID>();
-           auto track3 = LcCand.index2_as<ExtendedTracksPID>();
+          auto track0 = candidate.index1_as<ExtendedTracksPID>(); //daughter pion track
+          auto track1 = LcCand.index0_as<ExtendedTracksPID>(); //granddaughter tracks (lc decay particles)
+          auto track2 = LcCand.index1_as<ExtendedTracksPID>();
+          auto track3 = LcCand.index2_as<ExtendedTracksPID>();
 
-           auto RICHPi0 = -5000.0;
-           auto RICHTrk1Pi = -5000.0;
-           auto RICHTrk1p = -5000.0;
-           auto RICHTrk2K = -5000.0;
-           auto RICHTrk3Pi = -5000.0;
-           auto RICHTrk3p = -5000.0;
+          auto RICHPi0 = -5000.0;
+          auto RICHTrk1Pi = -5000.0;
+          auto RICHTrk1p = -5000.0;
+          auto RICHTrk2K = -5000.0;
+          auto RICHTrk3Pi = -5000.0;
+          auto RICHTrk3p = -5000.0;
 
-          if (track0.has_rich()) RICHPi0 = track0.rich().richNsigmaPi();
+          RICHPi0 = track0.rich().richNsigmaPi();//if (track0.has_rich())
           if (track1.has_rich()) RICHTrk1Pi = track1.rich().richNsigmaPi();
           if (track1.has_rich()) RICHTrk1p = track1.rich().richNsigmaPr();
           if (track2.has_rich()) RICHTrk2K = track2.rich().richNsigmaKa();
