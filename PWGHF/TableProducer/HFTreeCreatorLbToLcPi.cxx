@@ -288,7 +288,7 @@ struct HfTreeCreatorLbToLcPi {
           auto RICHTrk3Pi = -5000.0;
           auto RICHTrk3p = -5000.0;
 
-          RICHPi0 = track0.rich().richNsigmaPi();//if (track0.has_rich())
+          if (track0.has_rich()) RICHPi0 = track0.rich().richNsigmaPi();
           if (track1.has_rich()) RICHTrk1Pi = track1.rich().richNsigmaPi();
           if (track1.has_rich()) RICHTrk1p = track1.rich().richNsigmaPr();
           if (track2.has_rich()) RICHTrk2K = track2.rich().richNsigmaKa();
