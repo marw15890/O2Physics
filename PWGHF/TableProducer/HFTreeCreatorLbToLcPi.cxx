@@ -26,7 +26,9 @@
 #include "ReconstructionDataFormats/DCA.h"
 #include "Common/Core/TrackSelectorPID.h"
 #include "ALICE3/DataModel/RICH.h"
-#include "ALICE3/DataModel/MID.h"
+//#include "ALICE3/DataModel/MID.h"
+#include "Common/Core/PID/PIDResponse.h" //from D0 cand sel ALICE3 Barrel
+#include "ReconstructionDataFormats/PID.h" //from D0 cand sel ALICE3 Barrel
 
 using namespace o2;
 using namespace o2::framework;
@@ -208,7 +210,7 @@ struct HfTreeCreatorLbToLcPi {
   using TracksPID = soa::Join<aod::BigTracksPID, aod::HfTrackIndexALICE3PID>;
 
   //using ExtendedTracksPID = soa::Join<aod::BigTracksPID, aod::TracksExtended>;
-  using ExtendedTracksPID = soa::Join<TracksPID, aod::RICHTracksIndex, aod::McTrackLabels>; //aod::RICHTracksIndex,  aod::McTrackLabels, aod::TracksExtended, aod::RICHs, aod::MIDs
+  using ExtendedTracksPID = soa::Join<TracksPID,aod::TracksExtended, aod::RICHTracksIndex, aod::McTrackLabels>; //aod::RICHTracksIndex,  aod::McTrackLabels, aod::RICHs, aod::MIDs
 
   void process(//aod::Collisions const& collisions,
                //aod::McCollisions const& mccollisions,
