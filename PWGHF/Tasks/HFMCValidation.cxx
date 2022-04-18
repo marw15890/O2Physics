@@ -139,7 +139,7 @@ struct ValidationGenLevel {
             counter[iD]++;
           }
           for (std::size_t iDau = 0; iDau < listDaughters.size(); ++iDau) {
-            auto daughter = particlesMC.rawIteratorAt(listDaughters.at(iDau));
+            auto daughter = particlesMC.rawIteratorAt(listDaughters.at(iDau) - particlesMC.offset());
             sumPxDau += daughter.px();
             sumPyDau += daughter.py();
             sumPzDau += daughter.pz();

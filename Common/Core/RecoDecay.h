@@ -589,7 +589,7 @@ class RecoDecay
         return -1;
       }
       auto indexMotherTmp = particleMother.mothersIds().front();
-      particleMother = particlesMC.rawIteratorAt(indexMotherTmp);
+      particleMother = particlesMC.rawIteratorAt(indexMotherTmp - particlesMC.offset());
       // Check mother's PDG code.
       auto PDGParticleIMother = particleMother.pdgCode(); // PDG code of the mother
       //printf("getMother: ");
@@ -677,10 +677,10 @@ class RecoDecay
     stage++;
     if (particle.daughtersIds().front() != particle.daughtersIds().back()) {
       for (auto& idxDau : particle.daughtersIds()) {
-        getDaughters(particlesMC, particlesMC.rawIteratorAt(idxDau), list, arrPDGFinal, depthMax, stage);
+        getDaughters(particlesMC, particlesMC.rawIteratorAt(idxDau - particlesMC.offset()), list, arrPDGFinal, depthMax, stage);
       }
     } else {
-      getDaughters(particlesMC, particlesMC.rawIteratorAt(particle.daughtersIds().front()), list, arrPDGFinal, depthMax, stage);
+      getDaughters(particlesMC, particlesMC.rawIteratorAt(particle.daughtersIds().front() - particlesMC.offset()), list, arrPDGFinal, depthMax, stage);
     }
   }
 
@@ -728,7 +728,7 @@ class RecoDecay
           return -1;
         }
         //Printf("MC Rec: Good mother: %d", indexMother);
-        auto particleMother = particlesMC.rawIteratorAt(indexMother);
+        auto particleMother = particlesMC.rawIteratorAt(indexMother - particlesMC.offset());
         // Check the daughter indices.
         if (!particleMother.has_daughters()) {
           //Printf("MC Rec: Rejected: bad daughter index range: %d-%d", particleMother.daughtersIds().front(), particleMother.daughtersIds().back());
@@ -871,8 +871,8 @@ class RecoDecay
       }
       // Check daughters' PDG codes.
       for (auto indexDaughterI : arrAllDaughtersIndex) {
-        auto candidateDaughterI = particlesMC.rawIteratorAt(indexDaughterI); // ith daughter particle
-        auto PDGCandidateDaughterI = candidateDaughterI.pdgCode();           // PDG code of the ith daughter
+        auto candidateDaughterI = particlesMC.rawIteratorAt(indexDaughterI - particlesMC.offset()); // ith daughter particle
+        auto PDGCandidateDaughterI = candidateDaughterI.pdgCode();                                  // PDG code of the ith daughter
         //Printf("MC Gen: Daughter %d PDG: %d", indexDaughterI, PDGCandidateDaughterI);
         bool isPDGFound = false; // Is the PDG code of this daughter among the remaining expected PDG codes?
         for (std::size_t iProngCp = 0; iProngCp < N; ++iProngCp) {
