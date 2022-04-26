@@ -213,5 +213,12 @@ DECLARE_SOA_COLUMN(IsSelXiccToPKPiPi, isSelXiccToPKPiPi, int); //!
 } // namespace hf_selcandidate_xicc
 DECLARE_SOA_TABLE(HFSelXiccToPKPiPiCandidate, "AOD", "HFSELXICCCAND", //!
                   hf_selcandidate_xicc::IsSelXiccToPKPiPi);
+
+namespace hf_selcandidate_xicc4
+{
+DECLARE_SOA_COLUMN(IsSelXiccToLcPiKPi, isSelXiccToLcPiKPi, int); //!
+} // namespace hf_selcandidate_xicc
+DECLARE_SOA_TABLE(HFSelXiccToLcPiKPiCandidate, "AOD", "HFSELXICC4CAND", //!
+                  hf_selcandidate_xicc4::IsSelXiccToLcPiKPi);
 } // namespace o2::aod
 #endif // O2_ANALYSIS_HFCANDIDATESELECTIONTABLES_H_
