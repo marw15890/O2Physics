@@ -33,7 +33,7 @@
 using namespace o2;
 using namespace o2::framework;
 using namespace o2::aod::hf_cand;
-using namespace o2::aod::hf_cand_lb;
+using namespace o2::aod::hf_cand_XicctoLcPiKPi;
 
 namespace o2::aod
 {
@@ -46,6 +46,12 @@ DECLARE_SOA_COLUMN(ImpactParameterNormalised0, impactParameterNormalised0, float
 DECLARE_SOA_COLUMN(PtProng1, ptProng1, float);
 DECLARE_SOA_COLUMN(PProng1, pProng1, float);
 DECLARE_SOA_COLUMN(ImpactParameterNormalised1, impactParameterNormalised1, float);
+DECLARE_SOA_COLUMN(PtProng2, ptProng2, float);
+DECLARE_SOA_COLUMN(PProng2, pProng2, float);
+DECLARE_SOA_COLUMN(ImpactParameterNormalised2, impactParameterNormalised2, float);
+DECLARE_SOA_COLUMN(PtProng3, ptProng3, float);
+DECLARE_SOA_COLUMN(PProng3, pProng3, float);
+DECLARE_SOA_COLUMN(ImpactParameterNormalised3, impactParameterNormalised3, float);
 DECLARE_SOA_COLUMN(CandidateSelFlag, candidateSelFlag, int8_t);
 DECLARE_SOA_COLUMN(M, m, float);
 DECLARE_SOA_COLUMN(Pt, pt, float);
@@ -61,10 +67,8 @@ DECLARE_SOA_COLUMN(CPA, cpa, float);
 DECLARE_SOA_COLUMN(CPAXY, cpaXY, float);
 DECLARE_SOA_COLUMN(Ct, ct, float);
 DECLARE_SOA_COLUMN(MCflag, mcflag, int8_t);
-// DECLARE_SOA_COLUMN(PDGMother, PDGmother, int);
-DECLARE_SOA_COLUMN(NSigRICHPi0, nsigRICHPi0, float);
 DECLARE_SOA_COLUMN(NSigTOFPi0, nsigTOFPi0, float);
-////Lc selection parameters
+////Lc selection parameter
 DECLARE_SOA_COLUMN(LcM, lcM, float);
 DECLARE_SOA_COLUMN(LcCt, lcCt, float);
 DECLARE_SOA_COLUMN(LcY, lcY, float);
@@ -76,24 +80,21 @@ DECLARE_SOA_COLUMN(LcChi2PCA, lcChi2PCA, float);
 DECLARE_SOA_COLUMN(LcDecayLength, lcDecayLength, float);
 DECLARE_SOA_COLUMN(LcDecayLengthXY, lcDecayLengthXY, float);
 DECLARE_SOA_COLUMN(LcDecayLengthNormalised, lcDecayLengthNormalised, float);
-DECLARE_SOA_COLUMN(NSigRICHTrk1Pi, nSigRICHTrk1Pi, float);
-DECLARE_SOA_COLUMN(NSigRICHTrk1Pr, nSigRICHTrk1Pr, float);
-DECLARE_SOA_COLUMN(NSigRICHTrk2Ka, nSigRICHTrk2Ka, float);
-DECLARE_SOA_COLUMN(NSigRICHTrk3Pi, nSigRICHTrk3Pi, float);
-DECLARE_SOA_COLUMN(NSigRICHTrk3Pr, nSigRICHTrk3Pr, float);
-DECLARE_SOA_COLUMN(NSigTOFTrk1Pi, nSigTOFrk1Pi, float);
-DECLARE_SOA_COLUMN(NSigTOFTrk1Pr, nSigTOFrk1Pr, float);
-DECLARE_SOA_COLUMN(NSigTOFTrk2Ka, nSigTOFrk2Ka, float);
-DECLARE_SOA_COLUMN(NSigTOFTrk3Pi, nSigTOFrk3Pi, float);
-DECLARE_SOA_COLUMN(NSigTOFTrk3Pr, nSigTOFrk3Pr, float);
-
+DECLARE_SOA_COLUMN(NSigTOFTrk1Pi, nSigTOFTrk1Pi, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk2Ka, nSigTOFTrk2Ka, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk3Pi, nSigTOFTrk3Pi, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk4Pi, nSigTOFTrk4Pi, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk4Pr, nSigTOFTrk4Pr, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk5Ka, nSigTOFTrk5Ka, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk6Pi, nSigTOFTrk6Pi, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk6Pr, nSigTOFTrk6Pr, float);
 // Events
 DECLARE_SOA_COLUMN(IsEventReject, isEventReject, int);
 DECLARE_SOA_COLUMN(RunNumber, runNumber, int);
 } // namespace full
 
 // put the arguments into the table
-DECLARE_SOA_TABLE(HfCandLbFull, "AOD", "HFCANDLbFull",
+DECLARE_SOA_TABLE(HfXicc4Full, "AOD", "HFXicc4Full",
                   full::RSecondaryVertex,
                   full::DecayLength,
                   full::DecayLengthXY,
@@ -106,28 +107,40 @@ DECLARE_SOA_TABLE(HfCandLbFull, "AOD", "HFCANDLbFull",
                   full::ImpactParameterNormalised1,
                   full::PtProng1,
                   full::PProng1,
+                  full::ImpactParameterNormalised2,
+                  full::PtProng2,
+                  full::PProng2,
+                  full::ImpactParameterNormalised3,
+                  full::PtProng3,
+                  full::PProng3,
                   hf_cand::PxProng0,
                   hf_cand::PyProng0,
                   hf_cand::PzProng0,
                   hf_cand::PxProng1,
                   hf_cand::PyProng1,
                   hf_cand::PzProng1,
+                  hf_cand::PxProng2,
+                  hf_cand::PyProng2,
+                  hf_cand::PzProng2,
+                  hf_cand::PxProng3,
+                  hf_cand::PyProng3,
+                  hf_cand::PzProng3,
                   hf_cand::ImpactParameter0,
                   hf_cand::ImpactParameter1,
+                  hf_cand::ImpactParameter2,
+                  hf_cand::ImpactParameter3,
                   hf_cand::ErrorImpactParameter0,
                   hf_cand::ErrorImpactParameter1,
-                  full::NSigTOFPi0,
-                  full::NSigRICHPi0,
-                  full::NSigRICHTrk1Pi,
-                  full::NSigRICHTrk1Pr,
-                  full::NSigRICHTrk2Ka,
-                  full::NSigRICHTrk3Pi,
-                  full::NSigRICHTrk3Pr,
+                  hf_cand::ErrorImpactParameter2,
+                  hf_cand::ErrorImpactParameter3,
                   full::NSigTOFTrk1Pi,
-                  full::NSigTOFTrk1Pr,
                   full::NSigTOFTrk2Ka,
                   full::NSigTOFTrk3Pi,
-                  full::NSigTOFTrk3Pr,
+                  full::NSigTOFTrk4Pi,
+                  full::NSigTOFTrk4Pr,
+                  full::NSigTOFTrk5Ka,
+                  full::NSigTOFTrk6Pi,
+                  full::NSigTOFTrk6Pr,
                   full::LcM,
                   full::LcCt,
                   full::LcY,
@@ -150,150 +163,77 @@ DECLARE_SOA_TABLE(HfCandLbFull, "AOD", "HFCANDLbFull",
                   full::Phi,
                   full::Y,
                   full::MCflag);
-// full::PDGMother);
 
-//DECLARE_SOA_TABLE(HfCandLbFullEvents, "AOD", "HFCANDLbFullE",
-//                  collision::BCId,
-//                  collision::NumContrib,
-//                  collision::PosX,
-//                  collision::PosY,
-//                  collision::PosZ,
-//                  full::IsEventReject,
-//                  full::RunNumber);
+DECLARE_SOA_TABLE(HfXicc4FullEvents, "AOD", "HFXicc4FullE",
+                  collision::BCId,
+                  collision::NumContrib,
+                  collision::PosX,
+                  collision::PosY,
+                  collision::PosZ,
+                  full::IsEventReject,
+                  full::RunNumber);
 //
-//DECLARE_SOA_TABLE(HfCandLbFullParticles, "AOD", "HFCANDLbFullP",
-//                  collision::BCId,
-//                  full::Pt,
-//                  full::Eta,
-//                  full::Phi,
-//                  full::Y,
-//                  full::MCflag);
+DECLARE_SOA_TABLE(HfXicc4FullParticles, "AOD", "HFXicc4FullP",
+                  collision::BCId,
+                  full::Pt,
+                  full::Eta,
+                  full::Phi,
+                  full::Y,
+                  full::MCflag);
 
 } // namespace o2::aod
-
-// namespace o2::aod //copied from Jpsi cand sel
-//{
-// namespace hf_track_index_alice3_pid
-//{
-// DECLARE_SOA_INDEX_COLUMN(Track, track); //!
-// DECLARE_SOA_INDEX_COLUMN(RICH, rich);   //!
-// DECLARE_SOA_INDEX_COLUMN(MID, mid);     //!
-// } // namespace hf_track_index_alice3_pid
-//
-// DECLARE_SOA_INDEX_TABLE_USER(HfTrackIndexALICE3PID, Tracks, "HFTRKIDXA3PID", //!
-//                              hf_track_index_alice3_pid::TrackId,
-//                              hf_track_index_alice3_pid::RICHId,
-//                              hf_track_index_alice3_pid::MIDId);
-// } // namespace o2::aod
-//
-// struct Alice3PidIndexBuilder {
-//   Builds<o2::aod::HfTrackIndexALICE3PID> index;
-//   void init(o2::framework::InitContext&) {}
-// };
- //void customize(std::vector<o2::framework::ConfigParamSpec>& workflowOptions)
- //{
- //  ConfigParamSpec isAlice3{"isAlice3", VariantType::Bool, true, {"Switch between ALICE 2 and ALICE 3 detector setup"}};
- //  workflowOptions.push_back(isAlice3);
- //}
-
-namespace o2::aod
-{
-
-namespace indices
-{
-DECLARE_SOA_INDEX_COLUMN(Track, track);
-DECLARE_SOA_INDEX_COLUMN(RICH, rich);
-} // namespace indices
-DECLARE_SOA_INDEX_TABLE_USER(RICHTracksIndex, Tracks, "RICHTRK", indices::TrackId, indices::RICHId);
-} // namespace o2::aod
-
-struct richIndexBuilder { // Builder of the RICH-track index linkage
-  Builds<o2::aod::RICHTracksIndex> indB;
-  void init(o2::framework::InitContext&) {}
-};
 
 
 /// Writes the full information in an output TTree
-struct HfTreeCreatorLbToLcPi {
-  Produces<o2::aod::HfCandLbFull> rowCandidateFull;
-  //Produces<o2::aod::HfCandLbFullEvents> rowCandidateFullEvents;
-  //Produces<o2::aod::HfCandLbFullParticles> rowCandidateFullParticles;
+struct HfTreeCreatorXiccToLcpikpi {
+  Produces<o2::aod::HfXicc4Full> rowCandidateFull;
+  Produces<o2::aod::HfXicc4FullEvents> rowCandidateFullEvents;  // massive data tables keeping track of all particles. Not needed for ML
+  Produces<o2::aod::HfXicc4FullParticles> rowCandidateFullParticles; // // massive data tables keeping track of all particles. Not needed for ML
 
   void init(InitContext const&)
   {
   }
 
-  //using TracksPID = soa::Join<aod::BigTracksPID, aod::HfTrackIndexALICE3PID>; //from version from Jpsi
-
-  //using ExtendedTracksPID = soa::Join<aod::BigTracksPID, aod::TracksExtended>;
-  //using ExtendedTracksPID = soa::Join<TracksPID,aod::TracksExtended, aod::RICHTracksIndex, aod::McTrackLabels>; //aod::HfTrackIndexALICE3PID, aod::RICHTracksIndex,  aod::McTrackLabels, aod::RICHs, aod::MIDs
-  using ExtendedTracksPID = soa::Join<aod::BigTracksPIDExtended, aod::RICHTracksIndex, aod::McTrackLabels>; //from D0 cand sel ALICE3 Barrel
-
-  void process(//aod::Collisions const& collisions,
-               //aod::McCollisions const& mccollisions,
-               soa::Join<aod::HfCandLb, aod::HfCandLbMCRec, aod::HFSelLbToLcPiCandidate> const& candidates,
+  void process(aod::Collisions const& collisions,
+               aod::McCollisions const& mccollisions,
+               soa::Join<aod::HfCandXicctoLcPiKPi, aod::HfCandXicctoLcPiKPiMCRec, aod::HFSelXiccToLcPiKPiCandidate> const& candidates,
                soa::Join<aod::HfCandProng3, aod::HfCandProng3MCRec, aod::HFSelLcCandidate> const& Lccandidates,
-               //soa::Join<aod::McParticles, aod::HfCandLbMCGen> const& particles,
+               soa::Join<aod::McParticles, aod::HfCandXicctoLcPiKPiMCGen> const& particles,
                aod::BigTracksPID const& tracks,
-               aod::BigTracksMC const& bigtracksmc,
-               ExtendedTracksPID const&,
-               aod::RICHs const&)
+               aod::BigTracksMC const& bigtracksmc)
+               // , ExtendedTracksPID const&,
+               //aod::RICHs const&)
   // aod::MIDs const&)
   {
 
     // Filling event properties
-    //rowCandidateFullEvents.reserve(collisions.size());
-    //for (auto& collision : collisions) {
-    //  rowCandidateFullEvents(
-    //    collision.bcId(),
-    //    collision.numContrib(),
-    //    collision.posX(),
-    //    collision.posY(),
-    //    collision.posZ(),
-    //    0,
-    //    1);
-    //}
+    rowCandidateFullEvents.reserve(collisions.size());
+    for (auto& collision : collisions) {
+      rowCandidateFullEvents(
+        collision.bcId(),
+        collision.numContrib(),
+        collision.posX(),
+        collision.posY(),
+        collision.posZ(),
+        0,
+        1);
+    }
 
     // Filling candidate properties
     rowCandidateFull.reserve(candidates.size());
     for (auto& candidate : candidates) {
-      // Second peak investigation
-      /*int PDGmother = 0;
-      auto indexMother = RecoDecay::getMother(particles, candidate.index0_as<aod::BigTracksMC>().mcParticle_as<soa::Join<aod::McParticles, aod::HfCandLbMCGen>>(), pdg::Code::kLambdaB0, true, nullptr, 2);
-      if (indexMother != -1) {
-        PDGmother = pdg::Code::kLambdaB0;
-      } else {
-        indexMother = RecoDecay::getMother(particles, candidate.index0_as<aod::BigTracksMC>().mcParticle_as<soa::Join<aod::McParticles, aod::HfCandLbMCGen>>(), 533, true, nullptr, 2);
-        if (indexMother != -1) {
-          PDGmother = 533;
-        }
-      }*/
-      // end of second peak investigation
       auto fillTable = [&](int FunctionSelection,
                            float FunctionInvMass,
                            float FunctionCt,
                            float FunctionY) {
-        // int pdgmother) { //second peak inv
         if (FunctionSelection >= 1) { // Set to true to keep unselected events as well  FunctionSelection >= 1
           auto LcCand = candidate.index0_as<soa::Join<aod::HfCandProng3, aod::HfCandProng3MCRec, aod::HFSelLcCandidate>>();
-          auto track0 = candidate.index1_as<ExtendedTracksPID>(); //daughter pion track
-          auto track1 = LcCand.index0_as<ExtendedTracksPID>(); //granddaughter tracks (lc decay particles)
-          auto track2 = LcCand.index1_as<ExtendedTracksPID>();
-          auto track3 = LcCand.index2_as<ExtendedTracksPID>();
-
-          auto RICHPi0 = -5000.0;
-          auto RICHTrk1Pi = -5000.0;
-          auto RICHTrk1p = -5000.0;
-          auto RICHTrk2K = -5000.0;
-          auto RICHTrk3Pi = -5000.0;
-          auto RICHTrk3p = -5000.0;
-
-          if (track0.has_rich()) RICHPi0 = track0.rich().richNsigmaPi();
-          if (track1.has_rich()) RICHTrk1Pi = track1.rich().richNsigmaPi();
-          if (track1.has_rich()) RICHTrk1p = track1.rich().richNsigmaPr();
-          if (track2.has_rich()) RICHTrk2K = track2.rich().richNsigmaKa();
-          if (track3.has_rich()) RICHTrk3Pi = track3.rich().richNsigmaPi();
-          if (track3.has_rich()) RICHTrk3p = track3.rich().richNsigmaPr();
+          /* auto track0 = candidate.index1_as<ExtendedTracksPID>(); //daughter pion track
+          auto track1 = candidate.index2_as<ExtendedTracksPID>(); //daughter Kaon track
+          auto track2 = candidate.index3_as<ExtendedTracksPID>(); //daughter pion track
+          auto track3 = LcCand.index0_as<ExtendedTracksPID>(); //granddaughter tracks (lc decay particles)
+          auto track4 = LcCand.index1_as<ExtendedTracksPID>();
+          auto track5 = LcCand.index2_as<ExtendedTracksPID>(); */
 
           rowCandidateFull(
             candidate.rSecondaryVertex(),
@@ -308,28 +248,40 @@ struct HfTreeCreatorLbToLcPi {
             candidate.impactParameterNormalised1(),
             candidate.ptProng1(),
             RecoDecay::P(candidate.pxProng1(), candidate.pyProng1(), candidate.pzProng1()),
+            candidate.impactParameterNormalised2(),
+            candidate.ptProng2(),
+            RecoDecay::P(candidate.pxProng2(), candidate.pyProng2(), candidate.pzProng2()),
+            candidate.impactParameterNormalised3(),
+            candidate.ptProng3(),
+            RecoDecay::P(candidate.pxProng3(), candidate.pyProng3(), candidate.pzProng3()),
             candidate.pxProng0(),
             candidate.pyProng0(),
             candidate.pzProng0(),
             candidate.pxProng1(),
             candidate.pyProng1(),
             candidate.pzProng1(),
+            candidate.pxProng2(),
+            candidate.pyProng2(),
+            candidate.pzProng2(),
+            candidate.pxProng3(),
+            candidate.pyProng3(),
+            candidate.pzProng3(),
             candidate.impactParameter0(),
             candidate.impactParameter1(),
+            candidate.impactParameter2(),
+            candidate.impactParameter3(),
             candidate.errorImpactParameter0(),
             candidate.errorImpactParameter1(),
-            candidate.index1_as<ExtendedTracksPID>().tofNSigmaPi(),
-            RICHPi0,
-            RICHTrk1Pi,
-            RICHTrk1p,
-            RICHTrk2K,
-            RICHTrk3Pi,
-            RICHTrk3p,
-            track1.tofNSigmaPi(), // LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPi(),
-            track1.tofNSigmaPr(), // LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPr(),
-            track2.tofNSigmaKa(), // LcCand.index1_as<aod::BigTracksPID>().tofNSigmaKa(),
-            track3.tofNSigmaPi(), // LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPi(),
-            track3.tofNSigmaPr(), // LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPr(),
+            candidate.errorImpactParameter2(),
+            candidate.errorImpactParameter3(),
+            candidate.index1_as<aod::BigTracksPID>().tofNSigmaPi(),
+            candidate.index2_as<aod::BigTracksPID>().tofNSigmaKa(),
+            candidate.index3_as<aod::BigTracksPID>().tofNSigmaPi(),
+            LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPi(),
+            LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPr(),
+            LcCand.index1_as<aod::BigTracksPID>().tofNSigmaKa(),
+            LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPi(),
+            LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPr(),
             o2::aod::hf_cand_prong3::InvMassLcpKpi(LcCand),
             o2::aod::hf_cand_prong3::CtLc(LcCand),
             o2::aod::hf_cand_prong3::YLc(LcCand),
@@ -352,34 +304,31 @@ struct HfTreeCreatorLbToLcPi {
             candidate.phi(),
             FunctionY,
             candidate.flagMCMatchRec());
-          // pdgmother);
         }
       };
 
-      fillTable(candidate.isSelLbToLcPi(), InvMassLbToLcPi(candidate), CtLb(candidate), YLb(candidate)); //, PDGmother
+      fillTable(candidate.isSelXiccToLcPiKPi(), InvMassXiccToLcPiKPi(candidate), CtXicc(candidate), YXicc(candidate)); 
     }
 
     // Filling particle properties
-    //rowCandidateFullParticles.reserve(particles.size());
-    //for (auto& particle : particles) {
-    //  if (std::abs(particle.flagMCMatchGen()) == 1 << DecayType::LbToLcPi) {
-    //    rowCandidateFullParticles(
-    //      particle.mcCollision().bcId(),
-    //      particle.pt(),
-    //      particle.eta(),
-    //      particle.phi(),
-    //      RecoDecay::Y(array{particle.px(), particle.py(), particle.pz()}, RecoDecay::getMassPDG(particle.pdgCode())),
-    //      particle.flagMCMatchGen());
-    //  }
-    //}
+    rowCandidateFullParticles.reserve(particles.size());
+    for (auto& particle : particles) {
+      if (std::abs(particle.flagMCMatchGen()) == 1 << DecayType::XicctoLcPiKPi) {
+        rowCandidateFullParticles(
+          particle.mcCollision().bcId(),
+          particle.pt(),
+          particle.eta(),
+          particle.phi(),
+          RecoDecay::Y(array{particle.px(), particle.py(), particle.pz()}, RecoDecay::getMassPDG(particle.pdgCode())),
+          particle.flagMCMatchGen());
+      }
+    }
   }
 };
 
 WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
 {
   WorkflowSpec workflow;
-  //workflow.push_back(adaptAnalysisTask<Alice3PidIndexBuilder>(cfgc));
-  workflow.push_back(adaptAnalysisTask<richIndexBuilder>(cfgc));
-  workflow.push_back(adaptAnalysisTask<HfTreeCreatorLbToLcPi>(cfgc));
+  workflow.push_back(adaptAnalysisTask<HfTreeCreatorXiccToLcpikpi>(cfgc));
   return workflow;
 }

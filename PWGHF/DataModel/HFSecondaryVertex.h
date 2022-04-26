@@ -1265,11 +1265,11 @@ DECLARE_SOA_COLUMN(OriginMCRec, originMCRec, int8_t);       // particle origin, 
 DECLARE_SOA_COLUMN(OriginMCGen, originMCGen, int8_t);       // particle origin, generator level
 DECLARE_SOA_COLUMN(DebugMCRec, debugMCRec, int8_t);         // debug flag for mis-association reconstruction level
 // mapping of decay types
-enum DecayType { LbToLcPi }; // move this to a dedicated cascade namespace in the future?
+enum DecayType { XicctoLcPiKPi }; // move this to a dedicated cascade namespace in the future?
 
 // Λb → Λc+ π- → p K- π+ π-
 // float massLb = RecoDecay::getMassPDG(pdg::Code::kLambdaB0);
-template <typename T>
+/*template <typename T>
 auto CtXicc(const T& candidate)
 {
   return candidate.ct(RecoDecay::getMassPDG(pdg::Code::kXiCCPlusPlus));
@@ -1292,7 +1292,7 @@ auto InvMassXiccToLcPiKPi(const T& candidate)
 {
   return candidate.m(array{RecoDecay::getMassPDG(o2::analysis::pdg::kLambdaCPlus),  RecoDecay::getMassPDG(kPiPlus), RecoDecay::getMassPDG(kKMinus),RecoDecay::getMassPDG(kPiPlus)});
 
-}
+}*/
 } // namespace hf_cand_XicctoLcPiKPi
 
 // declare dedicated Lb candidate table
@@ -1364,7 +1364,11 @@ DECLARE_SOA_TABLE(HfCandXicctoLcPiKPiBase, "AOD", "HFCANDXICC4P",
                   hf_cand_prong4::M2<hf_cand::PxProng0, hf_cand::PyProng0, hf_cand::PzProng0, hf_cand::PxProng1, hf_cand::PyProng1, hf_cand::PzProng1,
                   hf_cand::PxProng2, hf_cand::PyProng2, hf_cand::PzProng2, hf_cand::PxProng3, hf_cand::PyProng3, hf_cand::PzProng3>,
                   hf_cand_prong4::ImpactParameterProduct<hf_cand::ImpactParameter0, hf_cand::ImpactParameter1, hf_cand::ImpactParameter2, hf_cand::ImpactParameter3>,
+                  hf_cand::ImpactParameterNormalised2<hf_cand::ImpactParameter2, hf_cand::ErrorImpactParameter2>,
+                  hf_cand::ImpactParameterNormalised3<hf_cand::ImpactParameter3, hf_cand::ErrorImpactParameter3>,
                   /* dynamic columns that use candidate momentum components */
+                  hf_cand::PtProng2<hf_cand::PxProng2, hf_cand::PyProng2>,
+                  hf_cand::PtProng3<hf_cand::PxProng3, hf_cand::PyProng3>,
                   hf_cand::Pt<hf_cand_prong4::Px, hf_cand_prong4::Py>,
                   hf_cand::Pt2<hf_cand_prong4::Px, hf_cand_prong4::Py>,
                   hf_cand::P<hf_cand_prong4::Px, hf_cand_prong4::Py, hf_cand_prong4::Pz>,
