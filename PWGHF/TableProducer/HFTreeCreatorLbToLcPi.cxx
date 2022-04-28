@@ -67,7 +67,7 @@ DECLARE_SOA_COLUMN(CPA, cpa, float);
 DECLARE_SOA_COLUMN(CPAXY, cpaXY, float);
 DECLARE_SOA_COLUMN(Ct, ct, float);
 DECLARE_SOA_COLUMN(MCflag, mcflag, int8_t);
-DECLARE_SOA_COLUMN(NSigTOFPi0, nsigTOFPi0, float);
+// DECLARE_SOA_COLUMN(NSigTOFPi0, nsigTOFPi0, float);
 ////Lc selection parameter
 DECLARE_SOA_COLUMN(LcM, lcM, float);
 DECLARE_SOA_COLUMN(LcCt, lcCt, float);
@@ -80,14 +80,14 @@ DECLARE_SOA_COLUMN(LcChi2PCA, lcChi2PCA, float);
 DECLARE_SOA_COLUMN(LcDecayLength, lcDecayLength, float);
 DECLARE_SOA_COLUMN(LcDecayLengthXY, lcDecayLengthXY, float);
 DECLARE_SOA_COLUMN(LcDecayLengthNormalised, lcDecayLengthNormalised, float);
-DECLARE_SOA_COLUMN(NSigTOFTrk1Pi, nSigTOFTrk1Pi, float);
+/*DECLARE_SOA_COLUMN(NSigTOFTrk1Pi, nSigTOFTrk1Pi, float);
 DECLARE_SOA_COLUMN(NSigTOFTrk2Ka, nSigTOFTrk2Ka, float);
 DECLARE_SOA_COLUMN(NSigTOFTrk3Pi, nSigTOFTrk3Pi, float);
 DECLARE_SOA_COLUMN(NSigTOFTrk4Pi, nSigTOFTrk4Pi, float);
 DECLARE_SOA_COLUMN(NSigTOFTrk4Pr, nSigTOFTrk4Pr, float);
 DECLARE_SOA_COLUMN(NSigTOFTrk5Ka, nSigTOFTrk5Ka, float);
 DECLARE_SOA_COLUMN(NSigTOFTrk6Pi, nSigTOFTrk6Pi, float);
-DECLARE_SOA_COLUMN(NSigTOFTrk6Pr, nSigTOFTrk6Pr, float);
+DECLARE_SOA_COLUMN(NSigTOFTrk6Pr, nSigTOFTrk6Pr, float); */
 // Events
 DECLARE_SOA_COLUMN(IsEventReject, isEventReject, int);
 DECLARE_SOA_COLUMN(RunNumber, runNumber, int);
@@ -133,14 +133,14 @@ DECLARE_SOA_TABLE(HfXicc4Full, "AOD", "HFXicc4Full",
                   hf_cand::ErrorImpactParameter1,
                   hf_cand::ErrorImpactParameter2,
                   hf_cand::ErrorImpactParameter3,
-                  full::NSigTOFTrk1Pi,
+                  /* full::NSigTOFTrk1Pi,
                   full::NSigTOFTrk2Ka,
                   full::NSigTOFTrk3Pi,
                   full::NSigTOFTrk4Pi,
                   full::NSigTOFTrk4Pr,
                   full::NSigTOFTrk5Ka,
                   full::NSigTOFTrk6Pi,
-                  full::NSigTOFTrk6Pr,
+                  full::NSigTOFTrk6Pr, */
                   full::LcM,
                   full::LcCt,
                   full::LcY,
@@ -274,14 +274,14 @@ struct HfTreeCreatorXiccToLcpikpi {
             candidate.errorImpactParameter1(),
             candidate.errorImpactParameter2(),
             candidate.errorImpactParameter3(),
-            candidate.index1_as<aod::BigTracksPID>().tofNSigmaPi(),
+            /*candidate.index1_as<aod::BigTracksPID>().tofNSigmaPi(),
             candidate.index2_as<aod::BigTracksPID>().tofNSigmaKa(),
             candidate.index3_as<aod::BigTracksPID>().tofNSigmaPi(),
             LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPi(),
             LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPr(),
             LcCand.index1_as<aod::BigTracksPID>().tofNSigmaKa(),
             LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPi(),
-            LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPr(),
+            LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPr(), */
             o2::aod::hf_cand_prong3::InvMassLcpKpi(LcCand),
             o2::aod::hf_cand_prong3::CtLc(LcCand),
             o2::aod::hf_cand_prong3::YLc(LcCand),
