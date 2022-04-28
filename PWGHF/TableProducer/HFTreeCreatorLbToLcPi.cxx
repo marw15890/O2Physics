@@ -199,8 +199,8 @@ struct HfTreeCreatorXiccToLcpikpi {
                soa::Join<aod::HfCandXicctoLcPiKPi, aod::HfCandXicctoLcPiKPiMCRec, aod::HFSelXiccToLcPiKPiCandidate> const& candidates,
                soa::Join<aod::HfCandProng3, aod::HfCandProng3MCRec, aod::HFSelLcCandidate> const& Lccandidates,
                soa::Join<aod::McParticles, aod::HfCandXicctoLcPiKPiMCGen> const& particles,
-               aod::BigTracksPID const& tracks,
-               aod::BigTracksMC const& bigtracksmc)
+               // aod::BigTracksPID const& tracks,
+               // aod::BigTracksMC const& bigtracksmc)
                // , ExtendedTracksPID const&,
                //aod::RICHs const&)
   // aod::MIDs const&)
