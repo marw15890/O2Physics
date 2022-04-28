@@ -68,7 +68,7 @@ struct HfLbToLcPiCandidateSelector {
     return true;
   }
 
-  void process(aod::HfCandXicctoLcPiKPi const& hfCandXicctoLcPiKPis, soa::Join<aod::HfCandProng3, aod::HFSelLcCandidate> )//, aod::BigTracksPID const&)
+  void process(aod::HfCandXicctoLcPiKPi const& hfCandXicctoLcPiKPis, soa::Join<aod::HfCandProng3, aod::HFSelLcCandidate>, aod::BigTracksPID const&)
   {
     for (auto& hfCandXicctoLcPiKPi : hfCandXicctoLcPiKPis) { //looping over Lb candidates
 
