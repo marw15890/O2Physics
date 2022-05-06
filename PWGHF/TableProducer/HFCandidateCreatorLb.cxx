@@ -164,13 +164,13 @@ struct HFCandidateCreatorLb {
         if (track3prong2.pt() < ptPionMin) {
             continue;
         }
-        if (track3prong0.sign() > 0) {
+        if (track3prong0.sign() < 0) {
             continue;
         }
-        if (track3prong1.sign() < 0) {
+        if (track3prong1.sign() > 0) {
             continue;
         }
-        if (track3prong2.sign() > 0) {
+        if (track3prong2.sign() < 0) {
             continue;
         }
  
