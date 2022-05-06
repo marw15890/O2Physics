@@ -16,7 +16,7 @@
 /// \note Extended from HFTreeCreatorD0ToKPi, HFTreeCreatorLcToPKPi, HFTreeCreatorXToJpsiPiPi
 ///
 /// \author Panos Christakoglou <Panos.Christakoglou@cern.ch>, Nikhef
-
+#include "FairLogger.h" // for LOG
 #include "Framework/runDataProcessing.h"
 #include "Framework/AnalysisTask.h"
 #include "DetectorsVertexing/DCAFitterN.h"
@@ -91,8 +91,8 @@ DECLARE_SOA_COLUMN(NSigTOFTrk6Pr, nSigTOFTrk6Pr, float);
 // Events
 DECLARE_SOA_COLUMN(IsEventReject, isEventReject, int);
 DECLARE_SOA_COLUMN(RunNumber, runNumber, int);
-} // namespace full
 
+} // namespace full
 // put the arguments into the table
 DECLARE_SOA_TABLE(HfXicc4Full, "AOD", "HFXicc4Full",
                   full::RSecondaryVertex,
@@ -172,15 +172,14 @@ DECLARE_SOA_TABLE(HfXicc4FullEvents, "AOD", "HFXicc4FullE",
                   collision::PosZ,
                   full::IsEventReject,
                   full::RunNumber);
-//
+// 
 DECLARE_SOA_TABLE(HfXicc4FullParticles, "AOD", "HFXicc4FullP",
                   collision::BCId,
                   full::Pt,
                   full::Eta,
                   full::Phi,
                   full::Y,
-                  full::MCflag);
-
+                  full::MCflag);  
 } // namespace o2::aod
 
 
@@ -192,8 +191,8 @@ struct HfTreeCreatorXiccToLcpikpi {
 
   void init(InitContext const&)
   {
+    LOG(info) << "void init" ;
   }
-
   void process(aod::Collisions const& collisions,
                aod::McCollisions const& mccollisions,
                soa::Join<aod::HfCandXicctoLcPiKPi, aod::HfCandXicctoLcPiKPiMCRec, aod::HFSelXiccToLcPiKPiCandidate> const& candidates,
@@ -205,7 +204,7 @@ struct HfTreeCreatorXiccToLcpikpi {
                //aod::RICHs const&)
   // aod::MIDs const&)
   {
-
+LOG(info) << "void process" ;
     // Filling event properties
     rowCandidateFullEvents.reserve(collisions.size());
     for (auto& collision : collisions) {
@@ -218,16 +217,19 @@ struct HfTreeCreatorXiccToLcpikpi {
         0,
         1);
     }
-
+LOG(info) << "Filling event properties" ;  
     // Filling candidate properties
     rowCandidateFull.reserve(candidates.size());
     for (auto& candidate : candidates) {
+
+LOG(info) << "Filling candidate properties, candidate";  
       auto fillTable = [&](int FunctionSelection,
                            float FunctionInvMass,
                            float FunctionCt,
                            float FunctionY) {
         if (FunctionSelection >= 1) { // Set to true to keep unselected events as well  FunctionSelection >= 1
           auto LcCand = candidate.index0_as<soa::Join<aod::HfCandProng3, aod::HfCandProng3MCRec, aod::HFSelLcCandidate>>();
+          LOG(info) << "if statement works"; 
           /* auto track0 = candidate.index1_as<ExtendedTracksPID>(); //daughter pion track
           auto track1 = candidate.index2_as<ExtendedTracksPID>(); //daughter Kaon track
           auto track2 = candidate.index3_as<ExtendedTracksPID>(); //daughter pion track
@@ -248,40 +250,40 @@ struct HfTreeCreatorXiccToLcpikpi {
             candidate.impactParameterNormalised1(),
             candidate.ptProng1(),
             RecoDecay::P(candidate.pxProng1(), candidate.pyProng1(), candidate.pzProng1()),
-            candidate.impactParameterNormalised2(),
-            candidate.ptProng2(),
-            RecoDecay::P(candidate.pxProng2(), candidate.pyProng2(), candidate.pzProng2()),
-            candidate.impactParameterNormalised3(),
-            candidate.ptProng3(),
-            RecoDecay::P(candidate.pxProng3(), candidate.pyProng3(), candidate.pzProng3()),
+            candidate.impactParameterNormalised2(), //
+            candidate.ptProng2(), //
+            RecoDecay::P(candidate.pxProng2(), candidate.pyProng2(), candidate.pzProng2()), //
+            candidate.impactParameterNormalised3(), //
+            candidate.ptProng3(), // 
+            RecoDecay::P(candidate.pxProng3(), candidate.pyProng3(), candidate.pzProng3()), //
             candidate.pxProng0(),
             candidate.pyProng0(),
             candidate.pzProng0(),
             candidate.pxProng1(),
             candidate.pyProng1(),
             candidate.pzProng1(),
-            candidate.pxProng2(),
-            candidate.pyProng2(),
-            candidate.pzProng2(),
-            candidate.pxProng3(),
-            candidate.pyProng3(),
-            candidate.pzProng3(),
+            candidate.pxProng2(), //
+            candidate.pyProng2(), //
+            candidate.pzProng2(), //
+            candidate.pxProng3(), //
+            candidate.pyProng3(), //
+            candidate.pzProng3(), //
             candidate.impactParameter0(),
             candidate.impactParameter1(),
-            candidate.impactParameter2(),
-            candidate.impactParameter3(),
+            candidate.impactParameter2(), //
+            candidate.impactParameter3(), //
             candidate.errorImpactParameter0(),
             candidate.errorImpactParameter1(),
-            candidate.errorImpactParameter2(),
-            candidate.errorImpactParameter3(),
-            candidate.index1_as<aod::BigTracksPID>().tofNSigmaPi(),
-            candidate.index2_as<aod::BigTracksPID>().tofNSigmaKa(),
-            candidate.index3_as<aod::BigTracksPID>().tofNSigmaPi(),
-            LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPi(),
-            LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPr(),
-            LcCand.index1_as<aod::BigTracksPID>().tofNSigmaKa(),
-            LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPi(),
-            LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPr(),
+            candidate.errorImpactParameter2(), //
+            candidate.errorImpactParameter3(), //
+            2.0,//candidate.index1_as<aod::BigTracksPID>().tofNSigmaPi(),
+            2.0,//candidate.index2_as<aod::BigTracksPID>().tofNSigmaKa(), //
+            2.0,//candidate.index3_as<aod::BigTracksPID>().tofNSigmaPi(), //
+            2.0,//LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPi(),
+            2.0,//LcCand.index0_as<aod::BigTracksPID>().tofNSigmaPr(),
+            2.0,//LcCand.index1_as<aod::BigTracksPID>().tofNSigmaKa(),
+            2.0,//LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPi(),
+            2.0,//LcCand.index2_as<aod::BigTracksPID>().tofNSigmaPr(),
             o2::aod::hf_cand_prong3::InvMassLcpKpi(LcCand),
             o2::aod::hf_cand_prong3::CtLc(LcCand),
             o2::aod::hf_cand_prong3::YLc(LcCand),
@@ -305,11 +307,13 @@ struct HfTreeCreatorXiccToLcpikpi {
             FunctionY,
             candidate.flagMCMatchRec());
         }
+        LOG(info) << "row candidates filled"; 
       };
 
       fillTable(candidate.isSelXiccToLcPiKPi(), InvMassXiccToLcPiKPi(candidate), CtXicc(candidate), YXicc(candidate)); 
+      LOG(info) << "fill table works"; 
     }
-
+LOG(info) << "Filling candidate properties" ;  
     // Filling particle properties
     rowCandidateFullParticles.reserve(particles.size());
     for (auto& particle : particles) {
@@ -323,11 +327,15 @@ struct HfTreeCreatorXiccToLcpikpi {
           particle.flagMCMatchGen());
       }
     }
+LOG(info) << "Filling particle properties" ; 
   }
+
+
 };
 
 WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
 {
+LOG(info) << "define" ; 
   WorkflowSpec workflow;
   workflow.push_back(adaptAnalysisTask<HfTreeCreatorXiccToLcpikpi>(cfgc));
   return workflow;
