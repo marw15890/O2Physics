@@ -279,6 +279,7 @@ struct HFCandidateCreatorLbMC {
 
   void process(aod::HfCandXicctoLcPiKPi const& candidates,
                aod::HfCandProng3,
+               // aod::HfCandProng4
                aod::BigTracksMC const& tracks,
                aod::McParticles const& particlesMC)
   {
@@ -298,19 +299,23 @@ struct HFCandidateCreatorLbMC {
       auto arrayDaughters = array{lcCand.index0_as<aod::BigTracksMC>(),
                                   lcCand.index1_as<aod::BigTracksMC>(),
                                   lcCand.index2_as<aod::BigTracksMC>(),
-                                  candidate.index1_as<aod::BigTracksMC>()};
+                                  candidate.index1_as<aod::BigTracksMC>(),
+                                  candidate.index2_as<aod::BigTracksMC>(),
+                                  candidate.index3_as<aod::BigTracksMC>()};
       auto arrayDaughtersLc = array{lcCand.index0_as<aod::BigTracksMC>(),
                                     lcCand.index1_as<aod::BigTracksMC>(),
                                     lcCand.index2_as<aod::BigTracksMC>()};
       // Λb → Λc+ π-
       //Printf("Checking Λb → Λc+ π-");
-      indexRec = RecoDecay::getMatchedMCRec(particlesMC, arrayDaughters, pdg::Code::kLambdaB0, array{+kProton, -kKPlus, +kPiPlus, -kPiPlus}, true, &sign, 2);
+      indexRec = RecoDecay::getMatchedMCRec(particlesMC, arrayDaughters, pdg::Code::kXiCCPlusPlus, array{+kProton, -kKPlus, +kPiPlus, +kPiPlus , -kKPlus , +kPiPlus}, true, &sign, 2);
+      //indexRec = RecoDecay::getMatchedMCRec(particlesMC, arrayDaughters, pdg::Code::kLambdaB0, array{+kProton, -kKPlus, +kPiPlus, -kPiPlus}, true, &sign, 2);
       if (indexRec > -1) {
         // Λb → Λc+ π-
         //Printf("Checking Λb → Λc+ π-");
         indexRec = RecoDecay::getMatchedMCRec(particlesMC, arrayDaughtersLc, pdg::Code::kLambdaCPlus, array{+kProton, -kKPlus, +kPiPlus}, true, &sign, 1);
         if (indexRec > -1) {
-          flag = 1 << hf_cand_lb::DecayType::LbToLcPi;
+          flag = 1 << hf_cand_XicctoLcPiKPi::DecayType::XicctoLcPiKPi ;  
+          //flag = 1 << hf_cand_lb::DecayType::LbToLcPi;   // sets equal to one
         } else {
           debug = 1;
           LOGF(info, "WARNING: Λb in decays in the expected final state but the condition on the intermediate state is not fulfilled");
@@ -325,12 +330,13 @@ struct HFCandidateCreatorLbMC {
       flag = 0;
       origin = 0;
       // Λb → Λc+ π-
-      if (RecoDecay::isMatchedMCGen(particlesMC, particle, pdg::Code::kLambdaB0, array{int(pdg::Code::kLambdaCPlus), -kPiPlus}, true)) {
+      if (RecoDecay::isMatchedMCGen(particlesMC, particle, pdg::Code::kXiCCPlusPlus, array{int(pdg::Code::kLambdaCPlus), +kPiPlus, -kKPlus, +kPiPlus}, true)) {
+      //if (RecoDecay::isMatchedMCGen(particlesMC, particle, pdg::Code::kLambdaB0, array{int(pdg::Code::kLambdaCPlus), -kPiPlus}, true)) {
         // Match Λc+ -> pKπ
         auto LcCandMC = particlesMC.rawIteratorAt(particle.daughtersIds().front());
         //Printf("Checking Λc+ → p K- π+");
         if (RecoDecay::isMatchedMCGen(particlesMC, LcCandMC, int(pdg::Code::kLambdaCPlus), array{+kProton, -kKPlus, +kPiPlus}, true, &sign)) {
-          flag = sign * (1 << hf_cand_lb::DecayType::LbToLcPi);
+          flag = sign * (1 << hf_cand_XicctoLcPiKPi::DecayType::XicctoLcPiKPi );
         }
       }
       rowMCMatchGen(flag, origin);
