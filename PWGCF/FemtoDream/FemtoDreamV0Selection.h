@@ -73,7 +73,9 @@ class FemtoDreamV0Selection : public FemtoDreamObjectSelection<float, femtoDream
                             CPAV0Min(9999999.),
                             TranRadV0Min(9999999.),
                             TranRadV0Max(-9999999.),
-                            DecVtxMax(-9999999.){};
+                            DecVtxMax(-9999999.),
+                            fInvMassLowLimit(1.10),
+                            fInvMassUpLimit(1.13){};
   /// Initializes histograms for the task
   template <o2::aod::femtodreamparticle::ParticleType part, o2::aod::femtodreamparticle::ParticleType daugh, typename cutContainerType>
   void init(HistogramRegistry* registry);
@@ -150,6 +152,15 @@ class FemtoDreamV0Selection : public FemtoDreamObjectSelection<float, femtoDream
     return outString;
   }
 
+  /// Set limit for the selection on the invariant mass
+  /// \param lowLimit Lower limit for the invariant mass distribution
+  /// \param upLimit Upper limit for the invariant mass distribution
+  void setInvMassLimits(float lowLimit, float upLimit)
+  {
+    fInvMassLowLimit = lowLimit;
+    fInvMassUpLimit = upLimit;
+  }
+
  private:
   int nPtV0MinSel;
   int nPtV0MaxSel;
@@ -165,6 +176,10 @@ class FemtoDreamV0Selection : public FemtoDreamObjectSelection<float, femtoDream
   float TranRadV0Min;
   float TranRadV0Max;
   float DecVtxMax;
+
+  float fInvMassLowLimit;
+  float fInvMassUpLimit;
+
   FemtoDreamTrackSelection PosDaughTrack;
   FemtoDreamTrackSelection NegDaughTrack;
 
@@ -194,7 +209,7 @@ class FemtoDreamV0Selection : public FemtoDreamObjectSelection<float, femtoDream
     "+1 for lambda, -1 for antilambda",
     "Minimum pT (GeV/c)",
     "Maximum pT (GeV/c)",
-    "Maximum DCA daugh from SV (cm)",
+    "Maximum DCA between daughters (cm)",
     "Minimum Cosine of Pointing Angle",
     "Minimum transverse radius (cm)",
     "Maximum transverse radius (cm)",
@@ -220,13 +235,14 @@ void FemtoDreamV0Selection::init(HistogramRegistry* registry)
     mHistogramRegistry->add((folderName + "/hPt").c_str(), "; #it{p}_{T} (GeV/#it{c}); Entries", kTH1F, {{1000, 0, 10}});
     mHistogramRegistry->add((folderName + "/hEta").c_str(), "; #eta; Entries", kTH1F, {{1000, -1, 1}});
     mHistogramRegistry->add((folderName + "/hPhi").c_str(), "; #phi; Entries", kTH1F, {{1000, 0, 2. * M_PI}});
-    mHistogramRegistry->add((folderName + "/hDaughDCAtoVtx").c_str(), "; DCA^{daugh}_{Vtx} (cm); Entries", kTH1F, {{1000, 0, 10}});
+    mHistogramRegistry->add((folderName + "/hDaughDCA").c_str(), "; DCA^{daugh} (cm); Entries", kTH1F, {{1000, 0, 10}});
     mHistogramRegistry->add((folderName + "/hTransRadius").c_str(), "; #it{r}_{xy} (cm); Entries", kTH1F, {{1500, 0, 150}});
-    mHistogramRegistry->add((folderName + "/hDecatVtxX").c_str(), "; #it{Vtx}_{x} (cm); Entries", kTH1F, {{2000, 0, 200}});
-    mHistogramRegistry->add((folderName + "/hDecatVtxY").c_str(), "; #it{Vtx}_{y} (cm)); Entries", kTH1F, {{2000, 0, 200}});
-    mHistogramRegistry->add((folderName + "/hDecatVtxZ").c_str(), "; #it{Vtx}_{z} (cm); Entries", kTH1F, {{2000, 0, 200}});
-    mHistogramRegistry->add((folderName + "/hCPA").c_str(), "; #it{cos(#sigma_{p})}; Entries", kTH1F, {{1000, 0.9, 1.}});
-    mHistogramRegistry->add((folderName + "/hCPAvsPt").c_str(), "; #it{p}_{T} (GeV/#it{c}); #it{cos(#sigma_{p})}", kTH2F, {{8, 0.3, 4.3}, {1000, 0.9, 1.}});
+    mHistogramRegistry->add((folderName + "/hDecayVtxX").c_str(), "; #it{Vtx}_{x} (cm); Entries", kTH1F, {{2000, 0, 200}});
+    mHistogramRegistry->add((folderName + "/hDecayVtxY").c_str(), "; #it{Vtx}_{y} (cm)); Entries", kTH1F, {{2000, 0, 200}});
+    mHistogramRegistry->add((folderName + "/hDecayVtxZ").c_str(), "; #it{Vtx}_{z} (cm); Entries", kTH1F, {{2000, 0, 200}});
+    mHistogramRegistry->add((folderName + "/hCPA").c_str(), "; #it{cos #theta_{p}}; Entries", kTH1F, {{1000, 0.9, 1.}});
+    mHistogramRegistry->add((folderName + "/hCPAvsPt").c_str(), "; #it{p}_{T} (GeV/#it{c}); #it{cos #theta_{p}}", kTH2F, {{8, 0.3, 4.3}, {1000, 0.9, 1.}});
+    mHistogramRegistry->add((folderName + "/hInvMass").c_str(), "; #it{m}_{#Lambda} (GeV/#it{c}^{2}); #it{m}_{#bar{#Lambda}} (GeV/#it{c}^{2})", kTH2F, {{150, 0.5, 2}, {150, 0.5, 2}});
 
     PosDaughTrack.init<aod::femtodreamparticle::ParticleType::kV0Child, aod::femtodreamparticle::cutContainerType>(mHistogramRegistry, "Pos");
     NegDaughTrack.init<aod::femtodreamparticle::ParticleType::kV0Child, aod::femtodreamparticle::cutContainerType>(mHistogramRegistry, "Neg");
@@ -263,6 +279,13 @@ bool FemtoDreamV0Selection::isSelectedMinimal(C const& col, V const& v0, T const
   const float tranRad = v0.v0radius();
   const float dcaDaughv0 = v0.dcaV0daughters();
   const float cpav0 = v0.v0cosPA(col.posX(), col.posY(), col.posZ());
+
+  const float invMassLambda = v0.mLambda();
+  const float invMassAntiLambda = v0.mAntiLambda();
+
+  if ((invMassLambda < fInvMassLowLimit or invMassLambda > fInvMassUpLimit) and (invMassAntiLambda < fInvMassLowLimit or invMassAntiLambda > fInvMassUpLimit)) {
+    return false;
+  }
 
   if (nPtV0MinSel > 0 && pT < pTV0Min) {
     return false;
@@ -322,13 +345,13 @@ std::array<cutContainerType, 5> FemtoDreamV0Selection::getCutContainer(C const& 
       if (sel.getSelectionValue() < 0) {
         auto nSigmaPr = negTrack.tpcNSigmaPr();
         auto nSigmaPi = posTrack.tpcNSigmaPi();
-        if (abs(nSigmaPr) < 3.5 && abs(nSigmaPi) < 3.5) {
+        if (abs(nSigmaPr) < 5 && abs(nSigmaPi) < 5) {
           sign = -1.;
         }
       } else {
-        auto nSigmaPi = negTrack.tpcNSigmaPr();
-        auto nSigmaPr = posTrack.tpcNSigmaPi();
-        if (abs(nSigmaPr) < 3.5 && abs(nSigmaPi) < 3.5) {
+        auto nSigmaPi = negTrack.tpcNSigmaPi();
+        auto nSigmaPr = posTrack.tpcNSigmaPr();
+        if (abs(nSigmaPr) < 5 && abs(nSigmaPi) < 5) {
           sign = 1.;
         }
       }
@@ -373,16 +396,17 @@ template <o2::aod::femtodreamparticle::ParticleType part, o2::aod::femtodreampar
 void FemtoDreamV0Selection::fillQA(C const& col, V const& v0, T const& posTrack, T const& negTrack)
 {
   if (mHistogramRegistry) {
-    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/pThist"), v0.pt());
-    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/etahist"), v0.eta());
-    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/phihist"), v0.phi());
-    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/dcaDauToVtx"), v0.dcaV0daughters());
-    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/transRadius"), v0.v0radius());
-    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/decayVtxXPV"), v0.x());
-    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/decayVtxYPV"), v0.y());
-    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/decayVtxZPV"), v0.z());
-    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/cpa"), v0.v0cosPA(col.posX(), col.posY(), col.posZ()));
-    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/cpapTBins"), v0.pt(), v0.v0cosPA(col.posX(), col.posY(), col.posZ()));
+    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/hPt"), v0.pt());
+    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/hEta"), v0.eta());
+    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/hPhi"), v0.phi());
+    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/hDaughDCA"), v0.dcaV0daughters());
+    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/hTransRadius"), v0.v0radius());
+    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/hDecayVtxX"), v0.x());
+    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/hDecayVtxY"), v0.y());
+    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/hDecayVtxZ"), v0.z());
+    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/hCPA"), v0.v0cosPA(col.posX(), col.posY(), col.posZ()));
+    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/hCPAvsPt"), v0.pt(), v0.v0cosPA(col.posX(), col.posY(), col.posZ()));
+    mHistogramRegistry->fill(HIST(o2::aod::femtodreamparticle::ParticleTypeName[part]) + HIST("/hInvMass"), v0.mLambda(), v0.mAntiLambda());
   }
   /// \TODO to add possibility to write to Daughters folders
   // PosDaughTrack.fillQA<aod::femtodreamparticle::ParticleType::kV0Child>(posTrack, "Pos");
