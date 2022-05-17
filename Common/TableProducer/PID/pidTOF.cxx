@@ -15,21 +15,18 @@
 /// \brief  Task to produce PID tables for TOF split for each particle with only the Nsigma information.
 ///         The event time maker can be used to produce event TOF times.
 ///         Only the tables for the mass hypotheses requested are filled, the others are sent empty.
+///         QA histograms for the TOF PID can be produced by adding `--add-qa 1` to the workflow
 ///
 
 // O2 includes
 #include "Framework/AnalysisTask.h"
-#include "Framework/HistogramRegistry.h"
 #include "ReconstructionDataFormats/Track.h"
 #include <CCDB/BasicCCDBManager.h>
 #include "Common/Core/PID/PIDResponse.h"
 #include "Common/Core/PID/PIDTOF.h"
-#include "Common/DataModel/TrackSelectionTables.h"
-#include "Common/DataModel/EventSelection.h"
 #include "TableHelper.h"
-#include "Framework/StaticFor.h"
-#include "TOFBase/EventTimeMaker.h"
 #include "pidTOFBase.h"
+#include "DPG/Tasks/qaPIDTOF.h"
 
 using namespace o2;
 using namespace o2::framework;
@@ -78,6 +75,10 @@ struct tofPid {
 
   void init(o2::framework::InitContext& initContext)
   {
+    // Check that both processes are not enabled
+    if (doprocessNoEvTime == true && doprocessEvTime == true) {
+      LOGF(fatal, "Cannot enable processNoEvTime and processEvTime at the same time. Please choose one.");
+    }
     // Checking the tables are requested in the workflow and enabling them
     auto enableFlag = [&](const std::string particle, Configurable<int>& flag) {
       const std::string table = "pidTOF" + particle;
@@ -125,7 +126,7 @@ struct tofPid {
     }
   }
 
-  using TrksEvTime = soa::Join<aod::Tracks, aod::TracksExtra, aod::TOFSignal, aod::TrackSelection>;
+  using TrksEvTime = soa::Join<aod::Tracks, aod::TracksExtra, aod::TOFSignal, aod::TOFEvTime>;
   template <o2::track::PID::ID pid>
   using ResponseImplementationEvTime = o2::pid::tof::ExpTimes<TrksEvTime::iterator, pid>;
   void processEvTime(TrksEvTime const& tracks, aod::Collisions const&)
@@ -157,20 +158,14 @@ struct tofPid {
     reserveTable(pidHe, tablePIDHe);
     reserveTable(pidAl, tablePIDAl);
 
-    int lastCollisionId = -1;      // Last collision ID analysed
-    for (auto const& t : tracks) { // Loop on collisions
-      if (!t.has_collision()) {    // Track was not assigned, cannot compute event time
-
+    for (auto const& trk : tracks) { // Loop on collisions
+      if (!trk.has_collision()) {    // Track was not assigned, cannot compute event time
         auto fillEmptyTable = [](const Configurable<int>& flag, auto& table) {
           if (flag.value != 1) {
             return;
           }
-          aod::pidutils::packInTable<aod::pidtof_tiny::binned_nsigma_t,
-                                     aod::pidtof_tiny::upper_bin,
-                                     aod::pidtof_tiny::lower_bin>(-999.f, table,
-                                                                  aod::pidtof_tiny::binned_min,
-                                                                  aod::pidtof_tiny::binned_max,
-                                                                  aod::pidtof_tiny::bin_width);
+          aod::pidutils::packInTable<aod::pidtof_tiny::binning>(-999.f,
+                                                                table);
         };
 
         fillEmptyTable(pidEl, tablePIDEl);
@@ -184,67 +179,25 @@ struct tofPid {
         fillEmptyTable(pidAl, tablePIDAl);
 
         continue;
-      } else if (t.collisionId() == lastCollisionId) { // Event time from this collision is already in the table
-        continue;
       }
-      /// Create new table for the tracks in a collision
-      lastCollisionId = t.collisionId(); /// Cache last collision ID
-
-      const auto tracksInCollision = tracks.sliceBy(aod::track::collisionId, lastCollisionId);
-      // First make table for event time
-      const auto evTime = evTimeMakerForTracks<TrksEvTime::iterator, filterForTOFEventTime, o2::pid::tof::ExpTimes>(tracksInCollision, response);
-      static constexpr bool removebias = true;
-      int ngoodtracks = 0;
 
       // Check and fill enabled tables
-      auto makeTable = [&tracksInCollision, &evTime, &ngoodtracks](const Configurable<int>& flag, auto& table, const DetectorResponse& response, const auto& responsePID) {
+      auto makeTable = [&trk, this](const Configurable<int>& flag, auto& table, const auto& responsePID) {
         if (flag.value == 1) {
-          ngoodtracks = 0;
-          // Prepare memory for enabled tables
-          table.reserve(tracksInCollision.size());
-          for (auto const& trk : tracksInCollision) { // Loop on Tracks
-            float et = evTime.eventTime;
-            float erret = evTime.eventTimeError;
-            if (erret > 199.f) {
-              aod::pidutils::packInTable<aod::pidtof_tiny::binned_nsigma_t,
-                                         aod::pidtof_tiny::upper_bin,
-                                         aod::pidtof_tiny::lower_bin>(-999.f, table,
-                                                                      aod::pidtof_tiny::binned_min,
-                                                                      aod::pidtof_tiny::binned_max,
-                                                                      aod::pidtof_tiny::bin_width);
-              continue;
-            }
-            if (filterForTOFEventTime(trk)) { // Check if it was used for the event time
-              if constexpr (removebias) {
-                float sumw = 1. / erret / erret;
-                et *= sumw;
-                et -= evTime.weights[ngoodtracks] * evTime.tracktime[ngoodtracks];
-                sumw -= evTime.weights[ngoodtracks++];
-                et /= sumw;
-                erret = sqrt(1. / sumw);
-              }
-            }
-
-            const float separation = responsePID.GetSeparation(response, trk, et, erret);
-            aod::pidutils::packInTable<aod::pidtof_tiny::binned_nsigma_t,
-                                       aod::pidtof_tiny::upper_bin,
-                                       aod::pidtof_tiny::lower_bin>(separation, table,
-                                                                    aod::pidtof_tiny::binned_min,
-                                                                    aod::pidtof_tiny::binned_max,
-                                                                    aod::pidtof_tiny::bin_width);
-          }
+          aod::pidutils::packInTable<aod::pidtof_tiny::binning>(responsePID.GetSeparation(response, trk, trk.tofEvTime(), trk.tofEvTimeErr()),
+                                                                table);
         }
       };
 
-      makeTable(pidEl, tablePIDEl, response, responseEl);
-      makeTable(pidMu, tablePIDMu, response, responseMu);
-      makeTable(pidPi, tablePIDPi, response, responsePi);
-      makeTable(pidKa, tablePIDKa, response, responseKa);
-      makeTable(pidPr, tablePIDPr, response, responsePr);
-      makeTable(pidDe, tablePIDDe, response, responseDe);
-      makeTable(pidTr, tablePIDTr, response, responseTr);
-      makeTable(pidHe, tablePIDHe, response, responseHe);
-      makeTable(pidAl, tablePIDAl, response, responseAl);
+      makeTable(pidEl, tablePIDEl, responseEl);
+      makeTable(pidMu, tablePIDMu, responseMu);
+      makeTable(pidPi, tablePIDPi, responsePi);
+      makeTable(pidKa, tablePIDKa, responseKa);
+      makeTable(pidPr, tablePIDPr, responsePr);
+      makeTable(pidDe, tablePIDDe, responseDe);
+      makeTable(pidTr, tablePIDTr, responseTr);
+      makeTable(pidHe, tablePIDHe, responseHe);
+      makeTable(pidAl, tablePIDAl, responseAl);
     }
   }
 
@@ -271,13 +224,8 @@ struct tofPid {
         // Prepare memory for enabled tables
         table.reserve(tracks.size());
         for (auto const& trk : tracks) { // Loop on Tracks
-          const float separation = responsePID.GetSeparation(response, trk);
-          aod::pidutils::packInTable<aod::pidtof_tiny::binned_nsigma_t,
-                                     aod::pidtof_tiny::upper_bin,
-                                     aod::pidtof_tiny::lower_bin>(separation, table,
-                                                                  aod::pidtof_tiny::binned_min,
-                                                                  aod::pidtof_tiny::binned_max,
-                                                                  aod::pidtof_tiny::bin_width);
+          aod::pidutils::packInTable<aod::pidtof_tiny::binning>(responsePID.GetSeparation(response, trk),
+                                                                table);
         }
       }
     };
@@ -295,130 +243,9 @@ struct tofPid {
   PROCESS_SWITCH(tofPid, processNoEvTime, "Produce TOF response without TOF event time, standard for Run 2", true);
 };
 
-/// Task to produce the TOF QA plots
-struct tofPidQa {
-  static constexpr int Np = 9;
-  static constexpr const char* pT[Np] = {"e", "#mu", "#pi", "K", "p", "d", "t", "^{3}He", "#alpha"};
-  static constexpr std::string_view hexpected[Np] = {"expected/El", "expected/Mu", "expected/Pi",
-                                                     "expected/Ka", "expected/Pr", "expected/De",
-                                                     "expected/Tr", "expected/He", "expected/Al"};
-  static constexpr std::string_view hexpected_diff[Np] = {"expected_diff/El", "expected_diff/Mu", "expected_diff/Pi",
-                                                          "expected_diff/Ka", "expected_diff/Pr", "expected_diff/De",
-                                                          "expected_diff/Tr", "expected_diff/He", "expected_diff/Al"};
-  static constexpr std::string_view hnsigma[Np] = {"nsigma/El", "nsigma/Mu", "nsigma/Pi",
-                                                   "nsigma/Ka", "nsigma/Pr", "nsigma/De",
-                                                   "nsigma/Tr", "nsigma/He", "nsigma/Al"};
-  HistogramRegistry histos{"Histos", {}, OutputObjHandlingPolicy::QAObject};
-
-  Configurable<int> logAxis{"logAxis", 0, "Flag to use a log momentum axis"};
-  Configurable<int> nBinsP{"nBinsP", 400, "Number of bins for the momentum"};
-  Configurable<float> minP{"minP", 0.1f, "Minimum momentum in range"};
-  Configurable<float> maxP{"maxP", 5.f, "Maximum momentum in range"};
-  Configurable<int> nBinsNSigma{"nBinsNSigma", 200, "Number of bins for the NSigma"};
-  Configurable<float> minNSigma{"minNSigma", -10.f, "Minimum NSigma in range"};
-  Configurable<float> maxNSigma{"maxNSigma", 10.f, "Maximum NSigma in range"};
-
-  template <uint8_t i>
-  void addParticleHistos()
-  {
-    AxisSpec pAxis{nBinsP, minP, maxP, "#it{p} (GeV/#it{c})"};
-    if (logAxis) {
-      pAxis.makeLogaritmic();
-    }
-
-    // NSigma
-    const AxisSpec nSigmaAxis{nBinsNSigma, minNSigma, maxNSigma, Form("N_{#sigma}^{TOF}(%s)", pT[i])};
-    histos.add(hnsigma[i].data(), "", HistType::kTH2F, {pAxis, nSigmaAxis});
-  }
-
-  void init(o2::framework::InitContext&)
-  {
-
-    const AxisSpec vtxZAxis{100, -20, 20, "Vtx_{z} (cm)"};
-    const AxisSpec tofAxis{10000, 0, 2e6, "TOF Signal"};
-    const AxisSpec etaAxis{100, -2, 2, "#it{#eta}"};
-    const AxisSpec colTimeAxis{100, -2000, 2000, "Collision time (ps)"};
-    const AxisSpec lAxis{100, 0, 500, "Track length (cm)"};
-    const AxisSpec ptResoAxis{100, 0, 0.1, "#sigma_{#it{p}_{T}}"};
-    AxisSpec ptAxis{nBinsP, minP, maxP, "#it{p}_{T} (GeV/#it{c})"};
-    AxisSpec pAxis{nBinsP, minP, maxP, "#it{p} (GeV/#it{c})"};
-    if (logAxis) {
-      ptAxis.makeLogaritmic();
-      pAxis.makeLogaritmic();
-    }
-
-    // Event properties
-    histos.add("event/vertexz", "", HistType::kTH1F, {vtxZAxis});
-    histos.add("event/colltime", "", HistType::kTH1F, {colTimeAxis});
-    histos.add("event/tofsignal", "", HistType::kTH2F, {pAxis, tofAxis});
-    histos.add("event/eta", "", HistType::kTH1F, {etaAxis});
-    histos.add("event/length", "", HistType::kTH1F, {lAxis});
-    histos.add("event/pt", "", HistType::kTH1F, {ptAxis});
-    histos.add("event/p", "", HistType::kTH1F, {pAxis});
-    // histos.add("event/ptreso", "", HistType::kTH2F, {pAxis, ptResoAxis});
-
-    addParticleHistos<0>();
-    addParticleHistos<1>();
-    addParticleHistos<2>();
-    addParticleHistos<3>();
-    addParticleHistos<4>();
-    addParticleHistos<5>();
-    addParticleHistos<6>();
-    addParticleHistos<7>();
-    addParticleHistos<8>();
-  }
-
-  template <o2::track::PID::ID i, typename T>
-  void fillParticleHistos(const T& t)
-  {
-    histos.fill(HIST(hnsigma[i]), t.p(), o2::aod::pidutils::tofNSigma(i, t));
-  }
-
-  void process(aod::Collision const& collision, soa::Join<aod::Tracks, aod::TracksExtra,
-                                                          aod::pidTOFEl, aod::pidTOFMu, aod::pidTOFPi,
-                                                          aod::pidTOFKa, aod::pidTOFPr, aod::pidTOFDe,
-                                                          aod::pidTOFTr, aod::pidTOFHe, aod::pidTOFAl,
-                                                          aod::TOFSignal, aod::TrackSelection> const& tracks)
-  {
-    const float collisionTime_ps = collision.collisionTime() * 1000.f;
-    histos.fill(HIST("event/vertexz"), collision.posZ());
-    histos.fill(HIST("event/colltime"), collisionTime_ps);
-
-    for (auto t : tracks) {
-      //
-      if (!t.hasTOF()) { // Skipping tracks without TOF
-        continue;
-      }
-      if (!t.isGlobalTrack()) {
-        continue;
-      }
-
-      // const float tof = t.tofSignal() - collisionTime_ps;
-
-      //
-      histos.fill(HIST("event/tofsignal"), t.p(), t.tofSignal());
-      histos.fill(HIST("event/eta"), t.eta());
-      histos.fill(HIST("event/length"), t.length());
-      histos.fill(HIST("event/pt"), t.pt());
-      // histos.fill(HIST("event/ptreso"), t.p(), t.sigma1Pt() * t.pt() * t.pt());
-      //
-      fillParticleHistos<o2::track::PID::Electron>(t);
-      fillParticleHistos<o2::track::PID::Muon>(t);
-      fillParticleHistos<o2::track::PID::Pion>(t);
-      fillParticleHistos<o2::track::PID::Kaon>(t);
-      fillParticleHistos<o2::track::PID::Proton>(t);
-      fillParticleHistos<o2::track::PID::Deuteron>(t);
-      fillParticleHistos<o2::track::PID::Triton>(t);
-      fillParticleHistos<o2::track::PID::Helium3>(t);
-      fillParticleHistos<o2::track::PID::Alpha>(t);
-    }
-  }
-};
-
 WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
 {
-  auto workflow = WorkflowSpec{adaptAnalysisTask<tofSignal>(cfgc),
-                               adaptAnalysisTask<tofPid>(cfgc)};
+  auto workflow = WorkflowSpec{adaptAnalysisTask<tofPid>(cfgc)};
   if (cfgc.options().get<int>("add-qa")) {
     workflow.push_back(adaptAnalysisTask<tofPidQa>(cfgc));
   }

@@ -64,6 +64,8 @@ DECLARE_SOA_COLUMN(Cut, cut, cutContainerType);       //! Bit-wise container for
 DECLARE_SOA_COLUMN(PIDCut, pidcut, cutContainerType); //! Bit-wise container for the different PID selection criteria \todo since bit-masking cannot be done yet with filters we use a second field for the PID
 DECLARE_SOA_COLUMN(TempFitVar, tempFitVar, float);    //! Observable for the template fitting (Track: DCA_xy, V0: CPA)
 DECLARE_SOA_COLUMN(Indices, indices, int[2]);         //! Field for the track indices to remove auto-correlations
+DECLARE_SOA_COLUMN(MLambda, mLambda, float);          //! The invariant mass of V0 candidate, assuming lambda
+DECLARE_SOA_COLUMN(MAntiLambda, mAntiLambda, float);  //! The invariant mass of V0 candidate, assuming antilambda
 
 DECLARE_SOA_DYNAMIC_COLUMN(Theta, theta, //! Compute the theta of the track
                            [](float eta) -> float {
@@ -95,6 +97,11 @@ DECLARE_SOA_DYNAMIC_COLUMN(TPCCrossedRowsOverFindableCls, tpcCrossedRowsOverFind
                            [](uint8_t tpcNClsFindable, uint8_t tpcNClsCrossedRows) -> float {
                              return (float)tpcNClsCrossedRows / (float)tpcNClsFindable;
                            });
+DECLARE_SOA_COLUMN(DaughDCA, daughDCA, float);       //! DCA between daughters
+DECLARE_SOA_COLUMN(TransRadius, transRadius, float); //! Transverse radius of the decay vertex
+DECLARE_SOA_COLUMN(DecayVtxX, decayVtxX, float);     //! X position of the decay vertex
+DECLARE_SOA_COLUMN(DecayVtxY, decayVtxY, float);     //! Y position of the decay vertex
+DECLARE_SOA_COLUMN(DecayVtxZ, decayVtxZ, float);     //! Z position of the decay vertex
 
 } // namespace femtodreamparticle
 DECLARE_SOA_TABLE(FemtoDreamParticles, "AOD", "FEMTODREAMPARTS",
@@ -108,6 +115,8 @@ DECLARE_SOA_TABLE(FemtoDreamParticles, "AOD", "FEMTODREAMPARTS",
                   femtodreamparticle::PIDCut,
                   femtodreamparticle::TempFitVar,
                   femtodreamparticle::Indices,
+                  femtodreamparticle::MLambda,
+                  femtodreamparticle::MAntiLambda,
                   femtodreamparticle::Theta<femtodreamparticle::Eta>,
                   femtodreamparticle::Px<femtodreamparticle::Pt, femtodreamparticle::Phi>,
                   femtodreamparticle::Py<femtodreamparticle::Pt, femtodreamparticle::Phi>,
@@ -137,6 +146,11 @@ DECLARE_SOA_TABLE(FemtoDreamDebugParticles, "AOD", "FEMTODEBUGPARTS",
                   pidtof_tiny::TOFNSigmaStoreKa,
                   pidtof_tiny::TOFNSigmaStorePr,
                   pidtof_tiny::TOFNSigmaStoreDe,
+                  femtodreamparticle::DaughDCA,
+                  femtodreamparticle::TransRadius,
+                  femtodreamparticle::DecayVtxX,
+                  femtodreamparticle::DecayVtxY,
+                  femtodreamparticle::DecayVtxZ,
                   femtodreamparticle::TPCCrossedRowsOverFindableCls<track::TPCNClsFindable, femtodreamparticle::TPCNClsCrossedRows>,
                   pidtpc_tiny::TPCNSigmaEl<pidtpc_tiny::TPCNSigmaStoreEl>,
                   pidtpc_tiny::TPCNSigmaPi<pidtpc_tiny::TPCNSigmaStorePi>,
