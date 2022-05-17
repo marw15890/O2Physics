@@ -44,8 +44,8 @@ struct BcSelectionTask {
     aod::Zdcs const&,
     aod::FV0As const&,
     aod::FV0Cs const&,
-    aod::FT0s const&,
-    aod::FDDs const&)
+    aod::FT0s const&)
+    //,aod::FDDs const&)
   {
 
     for (auto& bc : bcs) {
@@ -70,8 +70,8 @@ struct BcSelectionTask {
       float timeV0C = bc.has_fv0c() ? bc.fv0c().time() : -999.f;
       float timeT0A = bc.has_ft0() ? bc.ft0().timeA() : -999.f;
       float timeT0C = bc.has_ft0() ? bc.ft0().timeC() : -999.f;
-      float timeFDA = bc.has_fdd() ? bc.fdd().timeA() : -999.f;
-      float timeFDC = bc.has_fdd() ? bc.fdd().timeC() : -999.f;
+      //float timeFDA = bc.has_fdd() ? bc.fdd().timeA() : -999.f;
+      //float timeFDC = bc.has_fdd() ? bc.fdd().timeC() : -999.f;
 
       LOGF(debug, "timeZNA=%f timeZNC=%f", timeZNA, timeZNC);
       LOGF(debug, "timeV0A=%f timeV0C=%f", timeV0A, timeV0C);
@@ -154,13 +154,13 @@ struct BcSelectionTask {
 
       int32_t foundFT0 = bc.has_ft0() ? bc.ft0().globalIndex() : -1;
       int32_t foundFV0 = bc.has_fv0a() ? bc.fv0a().globalIndex() : -1;
-      int32_t foundFDD = bc.has_fdd() ? bc.fdd().globalIndex() : -1;
+      //int32_t foundFDD = bc.has_fdd() ? bc.fdd().globalIndex() : -1;
 
       // Fill bc selection columns
       bcsel(alias, selection,
             bbV0A, bbV0C, bgV0A, bgV0C,
             bbFDA, bbFDC, bgFDA, bgFDC,
-            multRingV0A, multRingV0C, spdClusters, foundFT0, foundFV0, foundFDD);
+            multRingV0A, multRingV0C, spdClusters, foundFT0, foundFV0 );//,foundFDD);
     }
   }
   PROCESS_SWITCH(BcSelectionTask, processRun2, "Process Run2 event selection", true);
@@ -168,8 +168,8 @@ struct BcSelectionTask {
   void processRun3(BCsWithRun3Matchings const& bcs,
                    aod::Zdcs const&,
                    aod::FV0As const&,
-                   aod::FT0s const&,
-                   aod::FDDs const&)
+                   aod::FT0s const&)
+                   //,aod::FDDs const&)
   {
 
     for (auto& bc : bcs) {
@@ -185,8 +185,8 @@ struct BcSelectionTask {
       float timeV0A = bc.has_fv0a() ? bc.fv0a().time() : -999.f;
       float timeT0A = bc.has_ft0() ? bc.ft0().timeA() : -999.f;
       float timeT0C = bc.has_ft0() ? bc.ft0().timeC() : -999.f;
-      float timeFDA = bc.has_fdd() ? bc.fdd().timeA() : -999.f;
-      float timeFDC = bc.has_fdd() ? bc.fdd().timeC() : -999.f;
+      //float timeFDA = bc.has_fdd() ? bc.fdd().timeA() : -999.f;
+      //float timeFDC = bc.has_fdd() ? bc.fdd().timeC() : -999.f;
 
       // applying timing selections
       bool bbV0A = timeV0A > par->fV0ABBlower && timeV0A < par->fV0ABBupper;
@@ -230,13 +230,13 @@ struct BcSelectionTask {
 
       int32_t foundFT0 = bc.has_ft0() ? bc.ft0().globalIndex() : -1;
       int32_t foundFV0 = bc.has_fv0a() ? bc.fv0a().globalIndex() : -1;
-      int32_t foundFDD = bc.has_fdd() ? bc.fdd().globalIndex() : -1;
+      //int32_t foundFDD = bc.has_fdd() ? bc.fdd().globalIndex() : -1;
       LOGP(debug, "foundFT0={}\n", foundFT0);
       // Fill bc selection columns
       bcsel(alias, selection,
             bbV0A, bbV0C, bgV0A, bgV0C,
             bbFDA, bbFDC, bgFDA, bgFDC,
-            multRingV0A, multRingV0C, spdClusters, foundFT0, foundFV0, foundFDD);
+            multRingV0A, multRingV0C, spdClusters, foundFT0, foundFV0); //, foundFDD);
     }
   }
   PROCESS_SWITCH(BcSelectionTask, processRun3, "Process Run3 event selection", false);
@@ -275,7 +275,7 @@ struct EventSelectionTask {
     int32_t foundBC = bc.globalIndex();
     int32_t foundFT0 = bc.foundFT0Id();
     int32_t foundFV0 = bc.foundFV0Id();
-    int32_t foundFDD = bc.foundFDDId();
+    //int32_t foundFDD = bc.foundFDDId();
 
     // copy alias decisions from bcsel table
     int32_t alias[kNaliases];
@@ -333,7 +333,7 @@ struct EventSelectionTask {
           bbV0A, bbV0C, bgV0A, bgV0C,
           bbFDA, bbFDC, bgFDA, bgFDC,
           multRingV0A, multRingV0C, spdClusters, nTkl, sel7, sel8,
-          foundBC, foundFT0, foundFV0, foundFDD);
+          foundBC, foundFT0, foundFV0); //, foundFDD);
   }
   PROCESS_SWITCH(EventSelectionTask, processRun2, "Process Run2 event selection", true);
 
@@ -381,7 +381,7 @@ struct EventSelectionTask {
     int32_t foundBC = bc.globalIndex();
     int32_t foundFT0 = bc.foundFT0Id();
     int32_t foundFV0 = bc.foundFV0Id();
-    int32_t foundFDD = bc.foundFDDId();
+    //int32_t foundFDD = bc.foundFDDId();
 
     LOGP(debug, "foundFT0 = {}", foundFT0);
 
@@ -432,7 +432,7 @@ struct EventSelectionTask {
           bbV0A, bbV0C, bgV0A, bgV0C,
           bbFDA, bbFDC, bgFDA, bgFDC,
           multRingV0A, multRingV0C, spdClusters, nTkl, sel7, sel8,
-          foundBC, foundFT0, foundFV0, foundFDD);
+          foundBC, foundFT0, foundFV0); //, foundFDD);
   }
   PROCESS_SWITCH(EventSelectionTask, processRun3, "Process Run3 event selection", false);
 };
