@@ -19,6 +19,11 @@ using namespace o2::framework;
 
 struct McConverter {
   Produces<aod::StoredMcParticles_001> mcParticles_001;
+  Produces<aod::FDDs_001> fdd_001;
+  Produces<aod::Zdcs> zdc;
+  Produces<aod::FV0As> v0a;
+  Produces<aod::FV0Cs> v0c;
+  Produces<aod::FT0s> ft0;
 
   void process(aod::StoredMcParticles_000 const& mcParticles_000)
   {
@@ -45,6 +50,22 @@ struct McConverter {
                       mothers, daughters, p.weight(), p.px(), p.py(), p.pz(), p.e(),
                       p.vx(), p.vy(), p.vz(), p.vt());
     }
+
+    // Make dummy FDD data
+    int16_t chargeA[8] = {0u};
+    int16_t chargeC[8] = {0u};
+
+    fdd_001(0, chargeA, chargeC, 0, 0, 0);
+
+    float energyZ[4] = {0.};
+    zdc(0, 0, 0, 0, 0, 0, 0, energyZ, energyZ, energyZ, energyZ, 0, 0, 0, 0 ,0 ,0);
+
+    std::vector<float> amp;
+    std::vector<uint8_t> chan;
+    v0a(0, amp, chan, 0, 0);
+    v0c(0, amp, chan, 0);
+    
+    ft0(0, amp, chan, amp, chan, 0, 0, 0);
   }
 };
 

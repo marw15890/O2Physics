@@ -78,7 +78,7 @@ struct HFCandidateCreatorLb {
                soa::Filtered<soa::Join<
                  aod::HfCandProng3,
                  aod::HFSelLcCandidate>> const& lcCands,
-                 aod::Hf3Prong const& rowsTrackIndexProng3,
+                 aod::Hf3Prongs const& rowsTrackIndexProng3, // addition of s
                aod::BigTracks const& tracks)
   {
  

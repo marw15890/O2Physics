@@ -57,6 +57,7 @@ struct TimestampTask {
   void process(aod::BC const& bc)
   {
     int runNumber = bc.runNumber();
+    LOGF(info, "Got run number %d",runNumber);
     // We need to set the orbit-reset timestamp for the run number.
     // This is done with caching if the run number was already processed before.
     // If not the orbit-reset timestamp for the run number is queried from CCDB and added to the cache
@@ -71,10 +72,9 @@ struct TimestampTask {
       const std::string run_path = Form("%s/%i", rct_path.value.data(), runNumber);
       headers = ccdb_api.retrieveHeaders(run_path, metadata, -1);
       if (headers.count("SOR") == 0) {
-        LOGF(fatal, "Cannot find start-of-run timestamp for run number in path '%s'.", run_path.data());
+        LOGF(warning, "Cannot find start-of-run timestamp for run number in path '%s'.", run_path.data());
       }
       int64_t sorTimestamp = atol(headers["SOR"].c_str()); // timestamp of the SOR in ms
-
       bool isUnanchoredRun3MC = runNumber >= 300000 && runNumber < 500000;
       if (isRun2MC || isUnanchoredRun3MC) {
         // isRun2MC: bc/orbit distributions are not simulated in Run2 MC. All bcs are set to 0.
