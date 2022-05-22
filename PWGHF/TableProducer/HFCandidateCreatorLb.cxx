@@ -14,7 +14,7 @@
 /// \note Adapted from HFCandidateCreatorXicc
 ///
 /// \author Panos Christakoglou <panos.christakoglou@cern.ch>, Nikhef
-
+#include "FairLogger.h" // for LOG
 #include "Framework/AnalysisTask.h"
 #include "DetectorsVertexing/DCAFitterN.h"
 #include "PWGHF/DataModel/HFSecondaryVertex.h"
@@ -288,6 +288,7 @@ struct HFCandidateCreatorLbMC {
     int8_t flag = 0;
     int8_t origin = 0;
     int8_t debug = 0;
+    LOG(info) << "indexRec" ;
 
     // Match reconstructed candidates.
     for (auto& candidate : candidates) {
@@ -307,9 +308,12 @@ struct HFCandidateCreatorLbMC {
                                     lcCand.index2_as<aod::BigTracksMC>()};
       // Λb → Λc+ π-
       //Printf("Checking Λb → Λc+ π-");
+      //indexRec = RecoDecay::getMatchedMCRec(particlesMC, arrayDaughters, pdg::Code::kXiCCPlusPlus, array{+kPiPlus , -kKPlus , +kPiPlus}, true, &sign, 2);
+      
       indexRec = RecoDecay::getMatchedMCRec(particlesMC, arrayDaughters, pdg::Code::kXiCCPlusPlus, array{+kProton, -kKPlus, +kPiPlus, +kPiPlus , -kKPlus , +kPiPlus}, true, &sign, 2);
       //indexRec = RecoDecay::getMatchedMCRec(particlesMC, arrayDaughters, pdg::Code::kLambdaB0, array{+kProton, -kKPlus, +kPiPlus, -kPiPlus}, true, &sign, 2);
       if (indexRec > -1) {
+        LOG(info) << indexRec ;
         // Λb → Λc+ π-
         //Printf("Checking Λb → Λc+ π-");
         indexRec = RecoDecay::getMatchedMCRec(particlesMC, arrayDaughtersLc, pdg::Code::kLambdaCPlus, array{+kProton, -kKPlus, +kPiPlus}, true, &sign, 1);
