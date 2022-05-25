@@ -247,8 +247,10 @@ struct HFCandidateCreatorLb {
                          pvecPion2[0], pvecPion2[1], pvecPion2[2],
                          impactParameter0.getY(), impactParameter1.getY(),impactParameter2.getY(),impactParameter3.getY(),
                          std::sqrt(impactParameter0.getSigmaY2()), std::sqrt(impactParameter1.getSigmaY2()),std::sqrt(impactParameter2.getSigmaY2()),std::sqrt(impactParameter3.getSigmaY2()),
-                         lcCand.globalIndex(), track0.globalIndex(), track1.globalIndex(), track2.globalIndex(),
+                         lcCand.globalIndex(), track3prong0.globalIndex(), track3prong1.globalIndex(), track3prong2.globalIndex(),
                          hfFlag);
+                         //lcCand.globalIndex(), track0.globalIndex(), track1.globalIndex(), track2.globalIndex(),
+                         //hfFlag);
 
         // calculate invariant mass
         auto arrayMomenta = array{pvecLc, pvecPion1, pvecKaon, pvecPion2};
