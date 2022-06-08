@@ -32,12 +32,12 @@ using namespace o2::analysis::hf_cuts_xicc_tolcpikpi;
 
 struct HfLbToLcPiCandidateSelector {
   Produces<aod::HFSelXiccToLcPiKPiCandidate> hFSelXiccToLcPiKPiCandidate;
-
+  
   Configurable<double> pTCandMin{"pTCandMin", 0., "Lower bound of candidate pT"};
   Configurable<double> pTCandMax{"pTCandMax", 36., "Upper bound of candidate pT"};
   Configurable<bool> d_FilterPID{"d_FilterPID", true, "Bool to use or not the PID at filtering level"};
   //Track quality
-  //Configurable<double> TPCNClsFindablePIDCut{"TPCNClsFindablePIDCut", 70., "Lower bound of TPC findable clusters for good PID"};
+  Configurable<double> TPCNClsFindablePIDCut{"TPCNClsFindablePIDCut", 70., "Lower bound of TPC findable clusters for good PID"};
 
   //TPC PID
   Configurable<double> pidTPCMinpT{"pidTPCMinpT", 0.15, "Lower bound of track pT for TPC PID"};
@@ -50,35 +50,44 @@ struct HfLbToLcPiCandidateSelector {
   Configurable<double> pidTOFMaxpT{"pidTOFMaxpT", 10., "Upper bound of track pT for TOF PID"};
   Configurable<double> nSigmaTOF{"nSigmaTOF", 5., "Nsigma cut on TOF only"};
   Configurable<double> nSigmaTOFCombined{"nSigmaTOFCombined", 5., "Nsigma cut on TOF combined with TPC"};
-
+   
   Configurable<std::vector<double>> pTBins{"pTBins", std::vector<double>{hf_cuts_xicc_tolcpikpi::pTBins_v}, "pT bin limits"};
   Configurable<LabeledArray<double>> cuts{"Xicc_to_lcpikpi_cuts", {hf_cuts_xicc_tolcpikpi::cuts[0], npTBins, nCutVars, pTBinLabels, cutVarLabels}, "Xicc candidate selection per pT bin"};
   Configurable<int> selectionFlagLc{"selectionFlagLc", 1, "Selection Flag for Lc+"};
-
+ 
   
   // Apply topological cuts as defined in HFSelectorCuts.h; return true if candidate passes all cuts
   template <typename T1, typename T2, typename T3,typename T4 ,typename T5 >
   bool selectionTopol(const T1& hfCandXicc, const T2& hfCandLc, const T3& trackPi1, const T4& trackKa, const T5& trackPi2 )
-  {
+  { 
     auto candpT = hfCandXicc.pt();
     int pTBin = findBin(pTBins, candpT);
     if (pTBin == -1) {
-      // Printf("Lb topol selection failed at getpTBin");
+      // Printf("Xicc topol selection failed at getpTBin");
       return false;
     }
-
-    // check that the candidate pT is within the analysis range
-    if (candpT < pTCandMin || candpT >= pTCandMax) {
-      return false;
-    }
+    
+    //check that the candidate pT is within the analysis range
+    //if (candpT < pTCandMin || candpT >= pTCandMax) {
+    //  return false;
+    //}
     
     
     // check candidate mass is within a defined mass window
     if (std::abs(InvMassXiccToLcPiKPi(hfCandXicc) - RecoDecay::getMassPDG(pdg::Code::kXiCCPlusPlus)) > cuts->get(pTBin, "m")) {
       return false;
     }
+    //Xicc CPA cut
+    if (hfCandXicc.cpa() < cuts->get(pTBin, "CPA")) {
+      return false;
+    }
+    // CPA XY
+    if (hfCandXicc.cpaXY() <= cuts->get(pTBin, "CPA XY")) {
+      return false;
+    }
 
 
+ /*
     //pt cuts on daughters
 
     //Pion  and Kaon pt cuts
@@ -95,37 +104,15 @@ struct HfLbToLcPiCandidateSelector {
     if (hfCandLc.pt() < cuts->get(pTBin, "pT Lc")) {
       return false;
     }
-    //Lc mass
-    //if (trackPi.sign() < 0) {
-    //if (std::abs(InvMassLcpKpi(hfCandLc) - RecoDecay::getMassPDG(pdg::Code::kLambdaCPlus)) > cuts->get(pTBin, "DeltaMLc")) {
-    //return false;
-    //}
-    //}
-    // impact parameter product
-    if (hfCandXicc.impactParameterProduct() > cuts->get(pTBin, "d0d0")) {
-      return false;
-    }
+
+    
+
     //Xicc Decay length
     if (hfCandXicc.decayLength() < cuts->get(pTBin, "Xicc decLen")) {
       return false;
     }
-    /*// candidate maximum decay length
-    if (hfCandXicc.decayLength() > cuts->get(pTBin, "max decay length")) {
-      return false;
-    }
-    // candidate minimum decay length
-    if (hfCandXicc.decayLength() <= cuts->get(pTBin, "min decay length")) {
-      return false;
-    }*/
-    // candidate maximum decay length XY
-    if (hfCandXicc.decayLengthXY() > cuts->get(pTBin, "max decay length XY")) {
-      return false;
-    }
 
-    // candidate minimum decay length XY
-    //if (hfCandXicc.decayLengthXY() < cuts->get(pTBin, "min decay length XY")) {
-    //  return false;
-    //}
+    
 
     //Xicc chi2PCA cut
     if (hfCandXicc.chi2PCA() > cuts->get(pTBin, "Chi2PCA")) {
@@ -133,12 +120,7 @@ struct HfLbToLcPiCandidateSelector {
       return false;
     }
 
-    //Xicc CPA cut
-    if (hfCandXicc.cpa() < cuts->get(pTBin, "CPA")) {
-      return false;
-    }
-
-    //d0 of pi  // do i need this? create two more?
+    //d0 
     if (std::abs(hfCandXicc.impactParameter1()) < cuts->get(pTBin, "d0 Pi")) {
       return false;
     }
@@ -155,11 +137,36 @@ struct HfLbToLcPiCandidateSelector {
     if (std::abs(hfCandXicc.impactParameter0()) < cuts->get(pTBin, "d0 Lc")) {
       return false;
     }
-    // cosine of pointing angle XY
-    if (hfCandXicc.cpaXY() <= cuts->get(pTBin, "CPA XY")) {
+
+    // impact parameter product
+    if (hfCandXicc.impactParameterProduct() > cuts->get(pTBin, "d0d0")) {
       return false;
     }
-    /*// minimum DCA of daughters
+    
+    
+     
+    //Lc mass
+    //if (trackPi.sign() < 0) {
+    //if (std::abs(InvMassLcpKpi(hfCandLc) - RecoDecay::getMassPDG(pdg::Code::kLambdaCPlus)) > cuts->get(pTBin, "DeltaMLc")) {
+    //return false;
+    //}
+    //}
+
+    // candidate minimum decay length
+    if (hfCandXicc.decayLength() <= cuts->get(pTBin, "min decay length")) {
+      return false;
+    }
+    // candidate maximum decay length XY
+    if (hfCandXicc.decayLengthXY() > cuts->get(pTBin, "max decay length XY")) {
+      return false;
+    }
+
+    // candidate minimum decay length XY
+    //if (hfCandXicc.decayLengthXY() < cuts->get(pTBin, "min decay length XY")) {
+    //  return false;
+    //}
+
+    // minimum DCA of daughters
     if ((std::abs(hfCandXicc.impactParameter0()) <= cuts->get(pTBin, "min d0 Xic")) ||
         (std::abs(hfCandXicc.impactParameter1()) <= cuts->get(pTBin, "min d0 Pi"))) {
       return false;
@@ -169,7 +176,7 @@ struct HfLbToLcPiCandidateSelector {
     if ((std::abs(hfCandXicc.impactParameter0()) > cuts->get(pTBin, "max d0 Xic")) ||
         (std::abs(hfCandXicc.impactParameter1()) > cuts->get(pTBin, "max d0 Pi"))) {
       return false;
-    }*/
+    } */
 
     return true;
   }
