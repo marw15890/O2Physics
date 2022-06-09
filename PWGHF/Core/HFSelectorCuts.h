@@ -711,7 +711,7 @@ static const std::vector<std::string> cutVarLabels = {"m", "CPA", "d0 Jpsi", "d0
 namespace hf_cuts_xicc_tolcpikpi
 {
 static const int npTBins = 10;
-static const int nCutVars = 12;
+static const int nCutVars = 13;
 // default values for the pT bin edges (can be used to configure histogram axis)
 // offset by 1 from the bin numbers in cuts array
 constexpr double pTBins[npTBins + 1] = {
@@ -729,16 +729,16 @@ constexpr double pTBins[npTBins + 1] = {
 auto pTBins_v = std::vector<double>{pTBins, pTBins + npTBins + 1};
 
 // default values for the cuts
-constexpr double cuts[npTBins][nCutVars] = {{1.000, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.02, 0.02, 0.90, 0.90, 0.02, 0.5},  /* 0  < pT < 1  */
-                                            {1.000, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.02, 0.02, 0.90, 0.90, 0.02, 0.5},  /* 1  < pT < 2  */
-                                            {1.000, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.02, 0.02, 0.90, 0.90, 0.02, 0.5},  /* 2  < pT < 3  */
-                                            {1.000, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.02, 0.02, 0.90, 0.90, 0.02, 0.5},  /* 3  < pT < 4  */
-                                            {1.000, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.02, 0.02, 0.90, 0.90, 0.02, 0.5},  /* 4  < pT < 5  */
-                                            {1.000, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.02, 0.02, 0.90, 0.90, 0.02, 0.5},  /* 5  < pT < 6  */
-                                            {1.000, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.02, 0.02, 0.90, 0.90, 0.02, 0.5},  /* 6  < pT < 8  */
-                                            {1.000, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.02, 0.02, 0.90, 0.90, 0.02, 0.5},  /* 8  < pT < 12 */
-                                            {1.000, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.02, 0.02, 0.90, 0.90, 0.02, 0.5},  /* 12 < pT < 24 */
-                                            {1.000, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.02, 0.02, 0.90, 0.90, 0.02, 0.5}}; /* 24 < pT < 36 */
+constexpr double cuts[npTBins][nCutVars] = {{0.600, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.5, 0.01, 0.01, 0.90, 0.90, 0.02, 0.5},  /* 0  < pT < 1  */
+                                            {0.600, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.5, 0.01, 0.01, 0.90, 0.90, 0.02, 0.5},  /* 1  < pT < 2  */
+                                            {0.600, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.5, 0.01, 0.01, 0.90, 0.90, 0.02, 0.5},  /* 2  < pT < 3  */
+                                            {0.600, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.5, 0.01, 0.01, 0.90, 0.90, 0.02, 0.5},  /* 3  < pT < 4  */
+                                            {0.600, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.5, 0.01, 0.01, 0.90, 0.90, 0.02, 0.5},  /* 4  < pT < 5  */
+                                            {0.600, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.5, 0.01, 0.01, 0.90, 0.90, 0.02, 0.5},  /* 5  < pT < 6  */
+                                            {0.600, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.5, 0.01, 0.01, 0.90, 0.90, 0.02, 0.5},  /* 6  < pT < 8  */
+                                            {0.600, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.5, 0.01, 0.01, 0.90, 0.90, 0.02, 0.5},  /* 8  < pT < 12 */
+                                            {0.600, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.5, 0.01, 0.01, 0.90, 0.90, 0.02, 0.5},  /* 12 < pT < 24 */
+                                            {0.600, 0.5, 0.2, 1.e-3, 1.e-3, 1.e-3, 0.5, 0.01, 0.01, 0.90, 0.90, 0.02, 0.5}}; /* 24 < pT < 36 */
 
 // row labels
 static const std::vector<std::string> pTBinLabels = {
@@ -754,7 +754,7 @@ static const std::vector<std::string> pTBinLabels = {
   "pT bin 9"};
 
 // column labels
-static const std::vector<std::string> cutVarLabels = {"m", "pT Lc", "pT Pi", "d0 Lc", "d0 Pi","Chi2PCA", "Xicc decLen","Xicc decLenXY", "CPA", "CPA XY","d0d0", "DeltaMLc"};
+static const std::vector<std::string> cutVarLabels = {"m", "pT Lc", "pT Pi", "d0 Lc", "d0 Pi","Chi2PCA", "Max Xicc decLen","Min Xicc decLen","Min Xicc decLenXY", "CPA", "CPA XY","d0d0", "DeltaMLc"};
 } // namespace hf_cuts_xicc_tolcpikpi
 
 } // namespace o2::analysis

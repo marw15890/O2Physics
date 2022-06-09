@@ -77,17 +77,44 @@ struct HfLbToLcPiCandidateSelector {
     if (std::abs(InvMassXiccToLcPiKPi(hfCandXicc) - RecoDecay::getMassPDG(pdg::Code::kXiCCPlusPlus)) > cuts->get(pTBin, "m")) {
       return false;
     }
+
     //Xicc CPA cut
     if (hfCandXicc.cpa() < cuts->get(pTBin, "CPA")) {
       return false;
     }
-    // CPA XY
+    //Xicc CPA XY cut
     if (hfCandXicc.cpaXY() <= cuts->get(pTBin, "CPA XY")) {
       return false;
     }
 
+ 
 
- /*
+    // candidate maximum decay length
+    if (hfCandXicc.decayLength() > cuts->get(pTBin, "Max Xicc decLen")) {
+      return false;
+    }
+    // candidate minimum decay length
+    if (hfCandXicc.decayLength() < cuts->get(pTBin, "Min Xicc decLen")) {
+      return false;
+    }
+
+ 
+    //Xicc Decay length XY
+    if (hfCandXicc.decayLengthXY() < cuts->get(pTBin, "Min Xicc decLenXY")) {
+      return false;
+    }
+
+    
+
+    //Xicc chi2PCA cut
+    if (hfCandXicc.chi2PCA() > cuts->get(pTBin, "Chi2PCA")) {
+      //Printf("Lb selection failed at chi2PCA");
+      return false;
+    }
+
+
+
+ 
     //pt cuts on daughters
 
     //Pion  and Kaon pt cuts
@@ -105,21 +132,8 @@ struct HfLbToLcPiCandidateSelector {
       return false;
     }
 
-    
 
-    //Xicc Decay length
-    if (hfCandXicc.decayLength() < cuts->get(pTBin, "Xicc decLen")) {
-      return false;
-    }
-
-    
-
-    //Xicc chi2PCA cut
-    if (hfCandXicc.chi2PCA() > cuts->get(pTBin, "Chi2PCA")) {
-      //Printf("Lb selection failed at chi2PCA");
-      return false;
-    }
-
+    /*
     //d0 
     if (std::abs(hfCandXicc.impactParameter1()) < cuts->get(pTBin, "d0 Pi")) {
       return false;
@@ -151,6 +165,11 @@ struct HfLbToLcPiCandidateSelector {
     //return false;
     //}
     //}
+
+    //Xicc Decay length
+    if (hfCandXicc.decayLength() < cuts->get(pTBin, "Xicc decLen")) {
+      return false;
+    }
 
     // candidate minimum decay length
     if (hfCandXicc.decayLength() <= cuts->get(pTBin, "min decay length")) {
