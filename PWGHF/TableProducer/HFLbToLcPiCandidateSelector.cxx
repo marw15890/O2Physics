@@ -12,7 +12,7 @@
 /// \file HFLbToLcPiCandidateSelector.cxx
 /// \brief Λb0 → Λc+ π- candidate selector
 ///
-/// \author Panos Christakoglou <panos.christakoglou@cern.ch>, Nikhef
+/// \author Mohammad Waris
 
 #include "Framework/runDataProcessing.h"
 #include "Framework/AnalysisTask.h"

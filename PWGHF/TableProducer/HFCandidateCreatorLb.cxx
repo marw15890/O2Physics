@@ -13,7 +13,7 @@
 /// \brief Reconstruction of Lb candidates
 /// \note Adapted from HFCandidateCreatorXicc
 ///
-/// \author Panos Christakoglou <panos.christakoglou@cern.ch>, Nikhef
+/// \author Mohammad Waris
 #include "FairLogger.h" // for LOG
 #include "Framework/AnalysisTask.h"
 #include "DetectorsVertexing/DCAFitterN.h"
