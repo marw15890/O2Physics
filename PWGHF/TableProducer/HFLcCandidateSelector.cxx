@@ -33,7 +33,7 @@ struct HFLcCandidateSelector {
 
   Configurable<double> d_pTCandMin{"d_pTCandMin", 0., "Lower bound of candidate pT"};
   Configurable<double> d_pTCandMax{"d_pTCandMax", 36., "Upper bound of candidate pT"};
-  Configurable<bool> d_FilterPID{"d_FilterPID", true, "Bool to use or not the PID at filtering level"};
+  Configurable<bool> d_FilterPID{"d_FilterPID", false, "Bool to use or not the PID at filtering level"};
   // TPC
   Configurable<double> d_pidTPCMinpT{"d_pidTPCMinpT", 0.1, "Lower bound of track pT for TPC PID"};
   Configurable<double> d_pidTPCMaxpT{"d_pidTPCMaxpT", 1., "Upper bound of track pT for TPC PID"};
@@ -81,7 +81,7 @@ struct HFLcCandidateSelector {
     if (candpT < d_pTCandMin || candpT >= d_pTCandMax) {
       return false;
     }
-
+    /*
     // cosine of pointing angle
     if (candidate.cpa() <= cuts->get(pTBin, "cos pointing angle")) {
       return false;
@@ -94,7 +94,7 @@ struct HFLcCandidateSelector {
 
     if (candidate.decayLength() <= cuts->get(pTBin, "decay length")) {
       return false;
-    }
+    } */
     return true;
   }
 
