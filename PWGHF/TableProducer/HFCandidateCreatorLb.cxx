@@ -106,9 +106,9 @@ struct HFCandidateCreatorLb {
 
     // loop over Lc candidates
     for (auto& lcCand : lcCands) {
-      if (!(lcCand.hfflag() & 1 << o2::aod::hf_cand_prong3::DecayType::LcToPKPi)) {
+      /*if (!(lcCand.hfflag() & 1 << o2::aod::hf_cand_prong3::DecayType::LcToPKPi)) {
         continue;
-      }   //comment this out for removing cuts on lc
+      }*/  //comment this out for removing cuts on lc
       if (lcCand.isSelLcpKpi() >= d_selectionFlagLc) {
         hMassLcToPKPi->Fill(InvMassLcpKpi(lcCand), lcCand.pt());
       }
