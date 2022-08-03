@@ -72,12 +72,19 @@ struct HFCandidateCreatorLb {
   
   Configurable<int> d_selectionFlagLc{"d_selectionFlagLc", 1, "Selection Flag for Lc"};
   Configurable<double> cutYCandMax{"cutYCandMax", -1., "max. cand. rapidity"};
-  Filter filterSelectCandidates = (aod::hf_selcandidate_lc::isSelLcpKpi >= d_selectionFlagLc || aod::hf_selcandidate_lc::isSelLcpiKp >= d_selectionFlagLc);
+  //Filter filterSelectCandidates = (aod::hf_selcandidate_lc::isSelLcpKpi >= d_selectionFlagLc || aod::hf_selcandidate_lc::isSelLcpiKp >= d_selectionFlagLc);
 
-  void process(aod::Collision const& collision,
+  /*void process(aod::Collision const& collision,
                soa::Filtered<soa::Join<
                  aod::HfCandProng3,
                  aod::HFSelLcCandidate>> const& lcCands,
+                 aod::Hf3Prongs const& rowsTrackIndexProng3, // addition of s
+               aod::BigTracks const& tracks)*/
+
+    void process(aod::Collision const& collision,
+                soa::Join<
+                 aod::HfCandProng3,
+                 aod::HFSelLcCandidate> const& lcCands,
                  aod::Hf3Prongs const& rowsTrackIndexProng3, // addition of s
                aod::BigTracks const& tracks)
   {
